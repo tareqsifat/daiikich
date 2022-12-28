@@ -1,0 +1,9 @@
+[19-Dec-2022 14:06:20 Asia/Kuala_Lumpur] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 7.4.0". You are running 7.2.34. in /home/daiikich/public_html/install/vendor/composer/platform_check.php on line 24
+[19-Dec-2022 06:15:09 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost' (using password: NO) in /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70
+Stack trace:
+#0 /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'forge', '', Array)
+#1 /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\Database\Connectors\Connector->createPdoConnection('mysql:host=127....', 'forge', '', Array)
+#2 /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\Database\Connectors\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\Database\Connectors\MySqlConnector->connect(Array)
+#4 [internal function]:  in /home/daiikich/public_html/vendor/laravel/framework/src/Illuminate/Database/Connection.php on line 712
+[28-Dec-2022 12:11:47 Asia/Kuala_Lumpur] PHP Fatal error:  Cannot declare class App\Models\BusinessSetting, because the name is already in use in /home/daiikich/public_html/app/BusinessSetting.php on line 7
