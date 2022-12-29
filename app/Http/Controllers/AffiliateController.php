@@ -18,6 +18,7 @@ use Auth;
 use DB;
 use Hash;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Cookie;
 
 class AffiliateController extends Controller
 {
@@ -136,6 +137,26 @@ class AffiliateController extends Controller
             flash(translate("You are already an affiliate user!"))->warning();
             return back();
         }
+//dd($request->referral_code);
+        if ($request->has('referral_code') && addon_is_activated('affiliate_system')) {
+            try {
+                $affiliate_validation_time = AffiliateConfig::where('type', 'validation_time')->first();
+                $cookie_minute = 30 * 24;
+                if ($affiliate_validation_time) {
+                    $cookie_minute = $affiliate_validation_time->value * 60;
+                }
+
+                Cookie::queue('referral_code', $request->referral_code, $cookie_minute);
+                $referred_by_user = User::where('referral_code', $request->referral_code)->first();
+
+                $affiliateController = new AffiliateController;
+                $affiliateController->processAffiliateStats($referred_by_user->id, 1, 0, 0, 0);
+
+
+            } catch (\Exception $e) {
+            }
+        }
+
         return view('affiliate.frontend.apply_for_affiliate');
     }
 
@@ -157,6 +178,13 @@ class AffiliateController extends Controller
                 $user->email = $request->email;
                 $user->user_type = "customer";
                 $user->password = Hash::make($request->password);
+                if(Cookie::has('referral_code')){
+                    $referral_code = Cookie::get('referral_code');
+                    $referred_by_user = User::where('referral_code', $referral_code)->first();
+                    if($referred_by_user != null){
+                        $user->referred_by = $referred_by_user->id;
+                    }
+                }
                 $user->save();
 
                 auth()->login($user, false);

@@ -45,7 +45,7 @@
                         </div>
                     </div>
 
-                  
+
                         <div class="row">
                             @php
                                 if(Auth::user()->referral_code == null){
@@ -54,21 +54,25 @@
                                 }
                                 $referral_code = Auth::user()->referral_code;
                                 $referral_code_url = URL::to('/users/registration')."?referral_code=$referral_code";
+                                $referral_code_url_seller = URL::to('/shops/create')."?referral_code=$referral_code";
+                                $referral_code_url_affiliate = URL::to('/affiliate')."?referral_code=$referral_code";
                             @endphp
                             <div class="col">
                                 <div class="card">
                                     <div class="form-box-content p-3">
                                         <div class="form-group">
                                             <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url}}</textarea>
+                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_seller}}</textarea>
+                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_affiliate}}</textarea>
                                         </div>
                                         <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                  
+
                     <br>
-                    
+
                     <div class="card">
                         <form class="" id="sort_blogs" action="" method="GET">
                             <div class="card-header row">
@@ -88,7 +92,7 @@
                                 </div>
                             </div>
                         </form>
-                        
+
                         <div class="card-body">
                             <div class="row gutters-10">
                                 <div class="col-md-3 mx-auto mb-3">
@@ -98,7 +102,7 @@
                                                 <span class="la-3x text-white">
                                                     @if($affliate_stats->count_click)
                                                         {{ $affliate_stats->count_click }}
-                                                    @else 
+                                                    @else
                                                         0
                                                     @endif
                                                 </span>
@@ -114,7 +118,7 @@
                                                 <span class="la-3x text-white">
                                                     @if($affliate_stats->count_item)
                                                         {{ $affliate_stats->count_item }}
-                                                    @else 
+                                                    @else
                                                         0
                                                     @endif
                                                 </span>
@@ -130,7 +134,7 @@
                                                 <span class="la-3x text-white">
                                                     @if($affliate_stats->count_delivered)
                                                         {{ $affliate_stats->count_delivered }}
-                                                    @else 
+                                                    @else
                                                         0
                                                     @endif
                                                 </span>
@@ -146,7 +150,7 @@
                                                 <span class="la-3x text-white">
                                                     @if($affliate_stats->count_cancel)
                                                         {{ $affliate_stats->count_cancel }}
-                                                    @else 
+                                                    @else
                                                         0
                                                     @endif
                                                 </span>
@@ -158,7 +162,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0 h6">{{translate('Affiliate Earning History')}}</h5>

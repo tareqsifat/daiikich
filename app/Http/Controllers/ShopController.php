@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateConfig;
 use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Models\BusinessSetting;
 use Auth;
 use Hash;
 use App\Notifications\EmailVerificationNotification;
+use Illuminate\Support\Facades\Cookie;
 
 class ShopController extends Controller
 {
@@ -34,7 +36,7 @@ class ShopController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         if (Auth::check()) {
 			if((Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'customer')) {
@@ -44,8 +46,27 @@ class ShopController extends Controller
 				flash(translate('This user already a seller'))->error();
 				return back();
 			}
-            
+
         } else {
+            if ($request->has('referral_code') && addon_is_activated('affiliate_system')) {
+                try {
+                    $affiliate_validation_time = AffiliateConfig::where('type', 'validation_time')->first();
+                    $cookie_minute = 30 * 24;
+                    if ($affiliate_validation_time) {
+                        $cookie_minute = $affiliate_validation_time->value * 60;
+                    }
+
+                    Cookie::queue('referral_code', $request->referral_code, $cookie_minute);
+                    $referred_by_user = User::where('referral_code', $request->referral_code)->first();
+
+                    $affiliateController = new AffiliateController;
+                    $affiliateController->processAffiliateStats($referred_by_user->id, 1, 0, 0, 0);
+
+
+                } catch (\Exception $e) {
+                }
+            }
+
             return view('frontend.seller_form');
         }
     }
@@ -70,6 +91,13 @@ class ShopController extends Controller
                 $user->email = $request->email;
                 $user->user_type = "seller";
                 $user->password = Hash::make($request->password);
+                if(Cookie::has('referral_code')){
+                    $referral_code = Cookie::get('referral_code');
+                    $referred_by_user = User::where('referral_code', $referral_code)->first();
+                    if($referred_by_user != null){
+                        $user->referred_by = $referred_by_user->id;
+                    }
+                }
                 $user->save();
             } else {
                 flash(translate('Sorry! Password did not match.'))->error();
