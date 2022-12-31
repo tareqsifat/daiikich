@@ -148,4 +148,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function product_queries(){
         return $this->hasMany(ProductQuery::class,'customer_id');
     }
+    public function child()
+    {
+        return $this->hasMany(User::class, 'referred_by', 'id')->with('child');
+    }
 }

@@ -48,6 +48,7 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
     });
 });
 
+Route::get('/affiliate_child', [AffiliateController::class,'affiliate_child']);
 //FrontEnd
 Route::controller(AffiliateController::class)->group(function () {
     Route::get('/affiliate', 'apply_for_affiliate')->name('affiliate.apply');

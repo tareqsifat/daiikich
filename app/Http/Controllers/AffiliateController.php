@@ -589,4 +589,13 @@ class AffiliateController extends Controller
         return back();
     }
 
+    public function affiliate_child()
+    {
+        $user = User::where('id', 3)->with('child')->first();
+        if(isset($user)){
+            return response()->json($user);
+        }
+        return response()->json(["Messaage"=> "All child"]);
+    }
+
 }
