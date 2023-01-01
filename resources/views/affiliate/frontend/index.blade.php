@@ -1,6 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" /> 
     <section class="py-5">
         <div class="container">
             <div class="d-flex align-items-start">
@@ -61,11 +62,63 @@
                                 <div class="card">
                                     <div class="form-box-content p-3">
                                         <div class="form-group">
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url}}</textarea>
+                                            <textarea id="referral_code_url" class="form-control fb_share_link" readonly type="text" >{{$referral_code_url}}</textarea>
                                             <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_seller}}</textarea>
                                             <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_affiliate}}</textarea>
                                         </div>
                                         <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="fb_share_icon form-box-content p-3">
+                                            <div class="form-group">
+                                                <i>
+                                                    <svg width="24" height="16" class="mx-auto" viewBox="0 0 14 25"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg" >
+                                                        <path d="M13.0823 13.9503L13.8098 9.46663H9.2662V6.54483C9.23638 6.20934 9.28614 5.87177 9.41186 5.55695C9.53758 5.24213 9.73606 4.95808 9.99266 4.72568C10.2493 4.49328 10.5575 4.31844 10.8946 4.21404C11.2318 4.10964 11.5893 4.07832 11.9408 4.12239H14V0.297495C12.7893 0.115183 11.5663 0.0157593 10.3405 0C6.60272 0 4.15188 2.12495 4.15188 6.03484V9.46663H0V13.9503H4.15188V24.8087C4.99942 24.937 5.85639 25.0009 6.71464 25C7.56919 25.0014 8.42247 24.9374 9.2662 24.8087V13.9503H13.0823Z"
+                                                        fill="white" />
+                                                    </svg>
+                                                </i>
+                                                <strong>Share on facebook</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card emailMe">
+                                        <div class="form-box-content p-3">
+                                            <div class="form-group">
+                                                <strong>Share on email</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <div class="form-box-content p-3">
+                                            <div class="form-group">
+                                                <a target="_blank" href="{{'http://twitter.com/share?text=Join British Market Place and get Discount&url=https://britishmarketplace.co.uk' . $referral_code_url }}">
+                                                    <strong>Share on twitter</strong>
+                                                </a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card share_whatsapp">
+                                        <div class="form-box-content p-3">
+                                            <div class="form-group">
+                                                <a target="_blank" href="{{'https://web.whatsapp.com/send?text=Join British Market Place and get Discount https://britishmarketplace.co.uk' . $referral_code_url}}" data-action="share/whatsapp/share">
+                                                    <strong>Share on WhatsApp</strong>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -355,5 +408,18 @@
         function show_affiliate_withdraw_modal(){
             $('#affiliate_withdraw_modal').modal('show');
         }
+        $(document).on('click', '.fb_share_icon', function (e) {
+            e.preventDefault();
+            let url = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbritishmarketplace.co.uk%2Freferral%2F"+ $('.fb_share_link').html() +"&amp;data-src=sdkpreparse";
+            window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
+        });
+
+        $(document).on('click', '.emailMe', function (e) {
+            e.preventDefault();
+            let refer_link = $('.fb_share_link').html();
+            let url = 'https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=Join+British+Market+Place+and+get+Discount&body=go+to '+ refer_link +'&ui=2&tf=1&pli=1';
+
+            window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
+        });
     </script>
 @endsection
