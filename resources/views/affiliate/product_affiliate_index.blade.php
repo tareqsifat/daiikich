@@ -48,25 +48,34 @@
 
 
                         <div class="row">
-                            @php
-                                if(Auth::user()->referral_code == null){
-                                    Auth::user()->referral_code = substr(Auth::user()->id.Str::random(), 0, 10);
-                                    Auth::user()->save();
-                                }
-                                $referral_code = Auth::user()->referral_code;
-                                $referral_code_url = URL::to('/users/registration')."?referral_code=$referral_code";
-                                $referral_code_url_seller = URL::to('/shops/create')."?referral_code=$referral_code";
-                                $referral_code_url_affiliate = URL::to('/affiliate')."?referral_code=$referral_code";
-                            @endphp
                             <div class="col">
                                 <div class="card">
                                     <div class="form-box-content p-3">
-                                        <div class="form-group">
-                                            <textarea id="referral_code_url" class="form-control fb_share_link" readonly type="text" >{{$referral_code_url}}</textarea>
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_seller}}</textarea>
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_affiliate}}</textarea>
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <form action="{{ route('search.ajax.get') }}" method="GET" class="ajax_search_product">
+                                                        @csrf
+                                                        <div class="d-flex position-relative align-items-center">
+                                                            <div class="d-lg-none" data-toggle="class-toggle" data-target=".front-header-search">
+                                                                <button class="btn px-2" type="button"><i class="la la-2x la-long-arrow-left"></i></button>
+                                                            </div>
+                                                            <div class="input-group">
+                                                                <input type="text" class="border-0 border-lg form-control search_input_box" id="search" name="keyword" placeholder="{{translate('I am shopping for...')}}" autocomplete="off">
+                                                                <div class="input-group-append d-none d-lg-block">
+                                                                    <button class="btn btn-primary" type="submit">
+                                                                        <i class="la la-search la-flip-horizontal fs-18"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <p class="search_product_show">Your searched product will appear here</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
                                     </div>
                                 </div>
                             </div>
@@ -102,8 +111,8 @@
                                     <div class="card">
                                         <div class="form-box-content p-3">
                                             <div class="form-group">
-                                                <a target="_blank" href="{{'http://twitter.com/share?text=Join British Market Place and get Discount&url=https://britishmarketplace.co.uk' . $referral_code_url }}">
-                                                    <strong>Share on twitter</strong>
+                                                {{-- <a target="_blank" href="{{'http://twitter.com/share?text=Join British Market Place and get Discount&url=https://britishmarketplace.co.uk' . $referral_code_url }}">
+                                                    <strong>Share on twitter</strong> --}}
                                                 </a>
 
                                             </div>
@@ -114,8 +123,8 @@
                                     <div class="card share_whatsapp">
                                         <div class="form-box-content p-3">
                                             <div class="form-group">
-                                                <a target="_blank" href="{{'https://web.whatsapp.com/send?text=Join British Market Place and get Discount https://britishmarketplace.co.uk' . $referral_code_url}}" data-action="share/whatsapp/share">
-                                                    <strong>Share on WhatsApp</strong>
+                                                {{-- <a target="_blank" href="{{'https://web.whatsapp.com/send?text=Join British Market Place and get Discount https://britishmarketplace.co.uk' . $referral_code_url}}" data-action="share/whatsapp/share">
+                                                    <strong>Share on WhatsApp</strong> --}}
                                                 </a>
                                             </div>
                                         </div>
@@ -267,159 +276,57 @@
                             </div>
                         </div>
                     </div>
-                    {{-- <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0 h6">{{ translate('Affiliate payment history')}}</h5>
-                                </div>
-                                  <div class="card-body">
-                                      <table class="table aiz-table mb-0">
-                                          <thead>
-                                              <tr>
-                                                  <th>#</th>
-                                                  <th>{{ translate('Date') }}</th>
-                                                  <th>{{translate('Amount')}}</th>
-                                                  <th>{{translate('Payment Method')}}</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody>
-                                              @foreach ($affiliate_payments as $key => $affiliate_payment)
-                                                  <tr>
-                                                      <td>{{ $key+1 }}</td>
-                                                      <td>{{ date('d-m-Y', strtotime($affiliate_payment->created_at)) }}</td>
-                                                      <td>{{ single_price($affiliate_payment->amount) }}</td>
-                                                      <td>{{ ucfirst(str_replace('_', ' ', $affiliate_payment ->payment_method)) }}</td>
-                                                  </tr>
-                                              @endforeach
-
-                                          </tbody>
-                                      </table>
-                                      <div class="aiz-pagination">
-                                          {{ $affiliate_payments->links() }}
-                                      </div>
-                                  </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0 h6">{{ translate('Affiliate withdraw request history')}}</h5>
-                                </div>
-                                  <div class="card-body">
-                                      <table class="table aiz-table mb-0">
-                                          <thead>
-                                              <tr>
-                                                  <th>#</th>
-                                                  <th>{{ translate('Date') }}</th>
-                                                  <th>{{ translate('Amount')}}</th>
-                                                  <th>{{ translate('Status')}}</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody>
-                                              @foreach ($affiliate_withdraw_requests as $key => $affiliate_withdraw_request)
-                                                  <tr>
-                                                      <td>{{ $key+1 }}</td>
-                                                      <td>{{ date('d-m-Y', strtotime($affiliate_withdraw_request->created_at)) }}</td>
-                                                      <td>{{ single_price($affiliate_withdraw_request->amount) }}</td>
-                                                      <td>
-                                                          @if($affiliate_withdraw_request->status == 1)
-                                                              <span class="badge badge-inline badge-success">{{translate('Approved')}}</span>
-                                                          @elseif($affiliate_withdraw_request->status == 2)
-                                                              <span class="badge badge-inline badge-danger">{{translate('Rejected')}}</span>
-                                                          @else
-                                                              <span class="badge badge-inline badge-info">{{translate('Pending')}}</span>
-                                                          @endif
-                                                      </td>
-                                                  </tr>
-                                              @endforeach
-                                          </tbody>
-                                      </table>
-                                      <div class="aiz-pagination">
-                                          {{ $affiliate_withdraw_requests->links() }}
-                                      </div>
-                                  </div>
-                            </div>
-                        </div>
-                    </div> --}}
                 </div>
             </div>
         </div>
     </section>
-@endsection
-
-@section('modal')
-
-    <div class="modal fade" id="affiliate_withdraw_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{ translate('Affiliate Withdraw Request') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <form class="" action="{{ route('affiliate.withdraw_request.store') }}" method="post">
-                    @csrf
-                    <div class="modal-body gry-bg px-3 pt-3">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label>{{ translate('Amount')}} <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="col-md-9">
-                                <input type="number" class="form-control mb-3" name="amount" min="1" max="{{ Auth::user()->affiliate_user->balance }}" placeholder="{{ translate('Amount')}}" required>
-                            </div>
-                        </div>
-                        <div class="form-group text-right">
-                            <button type="submit" class="btn btn-sm btn-primary transition-3d-hover mr-1">{{translate('Confirm')}}</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-@endsection
-
-
-@section('script')
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
     <script>
-        function copyToClipboard(btn){
-            // var el_code = document.getElementById('referral_code');
-            var el_url = document.getElementById('referral_code_url');
-            // var c_b = document.getElementById('ref-cp-btn');
-            var c_u_b = document.getElementById('ref-cpurl-btn');
+        $(".ajax_search_product").on("submit", function (e) {
+            e.preventDefault();
+        //     let formData = new FormData($(this)[0]);
 
-            // if(btn == 'code'){
-            //     if(el_code != null && c_b != null){
-            //         el_code.select();
-            //         document.execCommand('copy');
-            //         c_b .innerHTML  = c_b.dataset.attrcpy;
+        //     (async () => {
+        //     const rawResponse = await fetch($(this).attr("action"), {
+        //         method: 'POST',
+        //         headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json'
+        //         },
+        //         body: formData,
+        //     });
+        //     const content = await rawResponse.json();
+
+        //     // console.log(content);
+        //     $('.search_product_show').html('');
+        //     $('.search_product_show').html(content);
+        //     })();
+            let input = $('.search_input_box').val();
+            console.log(input);
+            fetch($(this).attr("action") + '?search=' + input)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                $('.search_product_show').html('');
+                $('.search_product_show').html(data);
+            });
+            // $.ajax({
+            //     url: $(this).attr("action"),
+            //     type: "POST",
+            //     data: formData,
+            //     success: (res) => {
+            //         $('.search_product_show').html('');
+            //         $('.search_product_show').html(res);
+            //         // $(this).trigger("reset");
+            //         // $(".note-editable").html("");
+            //         // $(".preloader").hide();
+            //         console.log(formData);
+            //     },
+            //     error: (err) => {
+            //         //
             //     }
-            // }
-
-            if(btn == 'url'){
-                if(el_url != null && c_u_b != null){
-                    el_url.select();
-                    document.execCommand('copy');
-                    c_u_b .innerHTML  = c_u_b.dataset.attrcpy;
-                }
-            }
-        }
-
-        function show_affiliate_withdraw_modal(){
-            $('#affiliate_withdraw_modal').modal('show');
-        }
-        $(document).on('click', '.fb_share_icon', function (e) {
-            e.preventDefault();
-            let url = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbritishmarketplace.co.uk%2Freferral%2F"+ $('.fb_share_link').html() +"&amp;data-src=sdkpreparse";
-            window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
+            // });
         });
 
-        $(document).on('click', '.emailMe', function (e) {
-            e.preventDefault();
-            let refer_link = $('.fb_share_link').html();
-            let url = 'https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=Join+British+Market+Place+and+get+Discount&body=go+to '+ refer_link +'&ui=2&tf=1&pli=1';
-
-            window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
-        });
     </script>
 @endsection
