@@ -233,4 +233,86 @@ class SearchController extends Controller
             $search->save();
         }
     }
+
+    public function produt_only_ajax_search()
+    {
+        $request = (object) request()->all();
+        $keywords = array();
+        $query = $request->search;
+        $products = Product::where('published', 1)->where('tags', 'like', '%' . $query . '%')->get();
+        foreach ($products as $key => $product) {
+            foreach (explode(',', $product->tags) as $key => $tag) {
+                if (stripos($tag, $query) !== false) {
+                    if (sizeof($keywords) > 5) {
+                        break;
+                    } else {
+                        if (!in_array(strtolower($tag), $keywords)) {
+                            array_push($keywords, strtolower($tag));
+                        }
+                    }
+                }
+            }
+        }
+
+        $products_query = filter_products(Product::query());
+
+        $products_query = $products_query->where('published', 1)
+            ->where(function ($q) use ($query) {
+                foreach (explode(' ', trim($query)) as $word) {
+                    $q->where('name', 'like', '%' . $word . '%')
+                        ->orWhere('tags', 'like', '%' . $word . '%')
+                        ->orWhereHas('product_translations', function ($q) use ($word) {
+                            $q->where('name', 'like', '%' . $word . '%');
+                        })
+                        ->orWhereHas('stocks', function ($q) use ($word) {
+                            $q->where('sku', 'like', '%' . $word . '%');
+                        });
+                }
+            });
+        $case1 = $query . '%';
+        $case2 = '%' . $query . '%';
+
+        $products_query->orderByRaw("CASE 
+                WHEN name LIKE '$case1' THEN 1 
+                WHEN name LIKE '$case2' THEN 2 
+                ELSE 3 
+                END");
+        $products = $products_query->get();
+        $return = '';
+        if(count($products) != 0){
+            foreach($products as $key => $value) {
+                $return = $return . $this->search_html($value, $key);
+            }
+            return response()->json($return);
+        }else{
+            return response()->json('<p class="text-center py-1">No product found</p>');
+        }
+
+
+    }
+
+    public function search_html($product, $key)
+    {
+        if(home_base_price($product) != home_discounted_base_price($product)){
+            $del_price = '<del class="opacity-60 fs-15">' . home_base_price($product) . '</del>';
+        }else {
+            $del_price = '';
+        }
+        return '<li class="list-group-item search_affiliate_product">
+            <a class="text-reset " href="' . route('product', $product->slug) . '">
+                <div class="d-flex search-product align-items-center">
+                    <div class="mr-3">
+                        <img class="size-40px img-fit rounded" src="' .uploaded_asset($product->thumbnail_img). '">
+                    </div>
+                    <div class="flex-grow-1 overflow--hidden minw-0">
+                        <div class="product-name text-truncate fs-14 mb-5px">'. $product->getTranslation('name') .'</div>
+                        <div class="">'
+                            . $del_price .
+                            '<span class="fw-600 fs-16 text-primary">'. home_discounted_base_price($product).'</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>';
+    }
 }

@@ -410,7 +410,8 @@
         }
         $(document).on('click', '.fb_share_icon', function (e) {
             e.preventDefault();
-            let url = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbritishmarketplace.co.uk%2Freferral%2F"+ $('.fb_share_link').html() +"&amp;data-src=sdkpreparse";
+            let url = "href=https://www.facebook.com/sharer/sharer.php?u="+$('.fb_share_link').html() +"%2F&amp;src=sdkpreparse";
+            // let url = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbritishmarketplace.co.uk%2Freferral%2F"+  +"&amp;data-src=sdkpreparse";
             window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
         });
 

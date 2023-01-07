@@ -612,7 +612,7 @@ class AffiliateController extends Controller
         $query->where('affiliate_user_id', Auth::user()->id);
         $affliate_stats = $query->first();
         $type = $request->type;
-        return view('affiliate.product_affiliate_index', compact('affiliate_logs', 'affliate_stats', 'type'));
+        return view('affiliate.frontend.product_affiliate_index', compact('affiliate_logs', 'affliate_stats', 'type'));
     }
 
 
