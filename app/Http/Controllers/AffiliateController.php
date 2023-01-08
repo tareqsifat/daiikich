@@ -14,6 +14,7 @@ use App\Models\AffiliateStats;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Product;
 use Auth;
 use DB;
 use Hash;
@@ -247,7 +248,7 @@ class AffiliateController extends Controller
 
     public function users(){
         $affiliate_users = AffiliateUser::paginate(12);
-        return view('affiliate.users', compact('affiliate_users'));
+        return view('affiliate.users ', compact('affiliate_users'));
     }
 
     public function show_verification_request($id){
@@ -613,6 +614,19 @@ class AffiliateController extends Controller
         $affliate_stats = $query->first();
         $type = $request->type;
         return view('affiliate.frontend.product_affiliate_index', compact('affiliate_logs', 'affliate_stats', 'type'));
+    }
+    public function products()
+    {
+        $products = Product::paginate(20);
+        return view('affiliate.products', compact('products'));
+    }
+
+    public function affiliate_product_update(Request $request)
+    {
+        $product = Product::findOrFail($request->id);
+        $product->affiliate = $request->status;
+        $product->save();
+        return 1;
     }
 
 
