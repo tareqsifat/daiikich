@@ -45,6 +45,9 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
 
         Route::get('/affiliate/logs', 'affiliate_logs_admin')->name('affiliate.logs.admin');
 
+        Route::get('/affiliate/products', 'products')->name('affiliate.products.admin');
+        Route::post('/affiliate/affiliate_product_update', 'affiliate_product_update')->name('affiliate.product.update');
+
     });
 });
 
