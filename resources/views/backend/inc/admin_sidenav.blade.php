@@ -761,6 +761,11 @@
                                         </a>
                                     </li>
                                 @endcan
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('affiliate.products.admin')}}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">Affiliate Products</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     @endcanany
