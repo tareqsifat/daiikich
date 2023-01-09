@@ -224,6 +224,11 @@
                                     </a>
                                 </li>
                                 <li class="aiz-side-nav-item">
+                                    <a href="{{ route('affiliate.product_index') }}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">{{ translate('Product Affilicate') }}</span>
+                                    </a>
+                                </li>
+                                <li class="aiz-side-nav-item">
                                     <a href="{{ route('affiliate.user.payment_history') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{ translate('Payment History') }}</span>
                                     </a>

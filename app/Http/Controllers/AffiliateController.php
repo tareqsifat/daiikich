@@ -589,4 +589,31 @@ class AffiliateController extends Controller
         return back();
     }
 
+    public function affiliate_child()
+    {
+        $user = User::where('id', 3)->with('child')->first();
+        if(isset($user)){
+            return response()->json($user);
+        }
+        return response()->json(["Messaage"=> "All child"]);
+    }
+    public function product_affiliate_index(Request $request){
+        $affiliate_logs = AffiliateLog::where('referred_by_user', Auth::user()->id)->latest()->paginate(10);
+
+        $query = AffiliateStats::query();
+        $query = $query->select(
+                        DB::raw('SUM(no_of_click) AS count_click, SUM(no_of_order_item) AS count_item, SUM(no_of_delivered) AS count_delivered,  SUM(no_of_cancel) AS count_cancel')
+                );
+        if($request->type == 'Today') {
+            $query->whereDate('created_at', Carbon::today());
+        } else if($request->type == '7' || $request->type ==  '30') {
+            $query->whereRaw('created_at  <= NOW() AND created_at >= DATE_SUB(created_at, INTERVAL '. $request->type .' DAY)');
+        }
+        $query->where('affiliate_user_id', Auth::user()->id);
+        $affliate_stats = $query->first();
+        $type = $request->type;
+        return view('affiliate.product_affiliate_index', compact('affiliate_logs', 'affliate_stats', 'type'));
+    }
+
+
 }

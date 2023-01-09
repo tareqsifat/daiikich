@@ -48,6 +48,7 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
     });
 });
 
+Route::get('/affiliate_child', [AffiliateController::class,'affiliate_child']);
 //FrontEnd
 Route::controller(AffiliateController::class)->group(function () {
     Route::get('/affiliate', 'apply_for_affiliate')->name('affiliate.apply');
@@ -57,6 +58,7 @@ Route::controller(AffiliateController::class)->group(function () {
 Route::group(['middleware' => ['auth']], function(){
     Route::controller(AffiliateController::class)->group(function () {
         Route::get('/affiliate/user', 'user_index')->name('affiliate.user.index');
+        Route::get('/product_affiliate', 'product_affiliate_index')->name('affiliate.product_index');
         Route::get('/affiliate/user/payment_history', 'user_payment_history')->name('affiliate.user.payment_history');
         Route::get('/affiliate/user/withdraw_request_history', 'user_withdraw_request_history')->name('affiliate.user.withdraw_request_history');
 
