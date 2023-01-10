@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" /> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <section class="py-5">
         <div class="container">
             <div class="d-flex align-items-start">
@@ -124,7 +124,7 @@
                                     </div>
                                 </div>
                                 <div class="container">
-                                    <div class="row"> 
+                                    <div class="row">
                                         <div class="col-md-3">
                                             <div class="card">
                                                 <div class="fb_share_icon form-box-content p-3">
@@ -172,7 +172,7 @@
                                                             </i>
                                                             <strong>Share on twitter</strong>
                                                         </a>
-        
+
                                                     </div>
                                                 </div>
                                             </div>
