@@ -170,7 +170,7 @@ Route::controller(SearchController::class)->group(function () {
     Route::get('/search', 'index')->name('search');
     Route::get('/search?keyword={search}', 'index')->name('suggestion.search');
     Route::post('/ajax-search', 'ajax_search')->name('search.ajax');
-    Route::get('/ajax-search', 'ajax_search')->name('search.ajax.get');
+    Route::get('/produt-only-ajax-search', 'produt_only_ajax_search')->name('search.ajax.get');
     Route::get('/category/{category_slug}', 'listingByCategory')->name('products.category');
     Route::get('/brand/{brand_slug}', 'listingByBrand')->name('products.brand');
 });
