@@ -64,11 +64,17 @@ Route::group(['middleware' => ['auth']], function(){
         Route::get('/product_affiliate', 'product_affiliate_index')->name('affiliate.product_index');
         Route::get('/affiliate/user/payment_history', 'user_payment_history')->name('affiliate.user.payment_history');
         Route::get('/affiliate/user/withdraw_request_history', 'user_withdraw_request_history')->name('affiliate.user.withdraw_request_history');
+        //Modify here
+        Route::get('/affiliate/user/view_product_sales_commission', 'view_product_sales_commission')->name('view.product.sales.commission');
+        Route::get('/affiliate/user/view_mlm_direct_commission', 'view_mlm_direct_commission')->name('view.mlm.direct.commission');
+
 
         Route::get('/affiliate/payment/settings', 'payment_settings')->name('affiliate.payment_settings');
         Route::post('/affiliate/payment/settings/store', 'payment_settings_store')->name('affiliate.payment_settings_store');
 
         // Affiliate Withdraw Request
         Route::post('/affiliate/withdraw_request/store', 'withdraw_request_store')->name('affiliate.withdraw_request.store');
+
+
     });
 });
