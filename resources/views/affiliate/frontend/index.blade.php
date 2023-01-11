@@ -62,11 +62,36 @@
                                 <div class="card">
                                     <div class="form-box-content p-3">
                                         <div class="form-group">
-                                            <textarea id="referral_code_url" class="form-control fb_share_link" readonly type="text" >{{$referral_code_url}}</textarea>
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_seller}}</textarea>
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_affiliate}}</textarea>
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="col-9">
+                                                        <textarea id="referral_code_url" class="form-control fb_share_link" readonly type="text" >{{$referral_code_url}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-9">
+                                                        <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_seller}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-9">
+                                                        <textarea id="referral_code_url" class="form-control" readonly type="text" >{{$referral_code_url_affiliate}}</textarea>
+                                                    </div>
+                                                </div>
+                                                    <div class="col-3">
+                                                        <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right m-1" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
+                                                        <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right m-1" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            
                                         </div>
                                         <button type=button id="ref-cpurl-btn" class="btn btn-primary float-right" data-attrcpy="{{translate('Copied')}}" onclick="copyToClipboard('url')" >{{translate('Copy Url')}}</button>
+                                        <!-- Button trigger modal -->
+                                        {{-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+                                            Launch demo modal
+                                        </button> --}}
                                     </div>
                                 </div>
                             </div>
@@ -104,7 +129,6 @@
                                             <div class="form-group">
                                                 <a target="_blank" href="{{'http://twitter.com/share?text=Join British Market Place and get Discount&url=https://britishmarketplace.co.uk' . $referral_code_url }}">
                                                     <strong>Share on twitter</strong>
-                                                </a>
 
                                             </div>
                                         </div>
@@ -377,6 +401,27 @@
             </div>
         </div>
     </div>
+    <!-- Modal -->
+        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 @endsection
 
 
@@ -411,7 +456,6 @@
         $(document).on('click', '.fb_share_icon', function (e) {
             e.preventDefault();
             let url = "href=https://www.facebook.com/sharer/sharer.php?u="+$('.fb_share_link').html() +"%2F&amp;src=sdkpreparse";
-            // let url = "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbritishmarketplace.co.uk%2Freferral%2F"+  +"&amp;data-src=sdkpreparse";
             window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
         });
 
