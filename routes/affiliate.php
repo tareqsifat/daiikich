@@ -75,6 +75,10 @@ Route::group(['middleware' => ['auth']], function(){
         // Affiliate Withdraw Request
         Route::post('/affiliate/withdraw_request/store', 'withdraw_request_store')->name('affiliate.withdraw_request.store');
 
+        // Affiliate Token Transfer
+        Route::post('/affiliate/token_transfer/store', 'token_transfer_store')->name('affiliate.token_transfer.store');
+        Route::get('/affiliate/user/token_transfer_history', 'user_token_transfer_history')->name('affiliate.user.token_transfer_history');
+
 
     });
 });

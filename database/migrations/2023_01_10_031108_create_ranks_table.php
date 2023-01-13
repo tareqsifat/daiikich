@@ -15,6 +15,10 @@ class CreateRanksTable extends Migration
     {
         Schema::create('ranks', function (Blueprint $table) {
             $table->id();
+            $table->string('rank_name');
+            $table->string('percentage');
+            $table->string('package_per_month');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateTokenTransfer;
 use App\Models\ReferralEarning;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use App\Models\AffiliateOption;
 use App\Models\Order;
@@ -308,6 +310,9 @@ class AffiliateController extends Controller
 
         $affiliate_user = AffiliateUser::findOrFail($request->affiliate_user_id);
         $affiliate_user->balance -= $request->amount;
+
+//        $affiliate_user->mlm_balance += $request->amount;
+
         $affiliate_user->save();
 
         flash(translate('Payment completed'))->success();
@@ -354,6 +359,8 @@ class AffiliateController extends Controller
         $level_commission = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '=', 3)->sum('amount');
 
+        //Total MLM Commission
+        $total_mlm = $mlm_direct_commission + $level_commission;
 
         return view('affiliate.frontend.index',
             compact('affiliate_logs', 'affliate_stats', 'type', 'total_amount', 'mlm_direct_commission', 'level_commission'));
@@ -375,6 +382,14 @@ class AffiliateController extends Controller
         $affiliate_withdraw_requests = AffiliateWithdrawRequest::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
 
         return view('affiliate.frontend.withdraw_request_history', compact('affiliate_withdraw_requests'));
+    }
+
+    public function user_token_transfer_history()
+    {
+        $affiliate_user = Auth::user()->affiliate_user;
+        $affiliate_token_transfer = AffiliateTokenTransfer::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+
+        return view('affiliate.frontend.token_transfer_history', compact('affiliate_token_transfer'));
     }
 
     public function payment_settings()
@@ -550,11 +565,25 @@ class AffiliateController extends Controller
         $withdraw_request->amount = $request->amount;
         $withdraw_request->status = 0;
 
-        if ($withdraw_request->save()) {
 
+        if ($withdraw_request->save()) {
             $affiliate_user = AffiliateUser::where('user_id', Auth::user()->id)->first();
-            $affiliate_user->balance = $affiliate_user->balance - $request->amount;
-            $affiliate_user->save();
+            if ($affiliate_user->next_withdraw_date != null && strtotime($affiliate_user->next_withdraw_date) > strtotime(Carbon::now())) {
+                flash(translate('Withdraw not available'))->error();
+                return back();
+            }
+            $partial_balance = (($affiliate_user->balance + $affiliate_user->mlm_balance) * .75) - $affiliate_user->withdraw_balance;
+            if ($partial_balance >= $request->amount) {
+                $affiliate_user->total_balance = $affiliate_user->total_balance - $request->amount;
+                $affiliate_user->withdraw_balance = $affiliate_user->withdraw_balance + $request->amount;
+
+                $affiliate_user->next_withdraw_date = Carbon::now()->addDays(15);
+                $affiliate_user->save();
+            } else {
+                flash(translate('Insufficient Balance'))->error();
+                return back();
+            }
+
 
             flash(translate('New withdraw request created successfully'))->success();
             return redirect()->route('affiliate.user.withdraw_request_history');
@@ -563,6 +592,42 @@ class AffiliateController extends Controller
             return back();
         }
     }
+
+    // Affiliate Token Transfer
+    public function token_transfer_store(Request $request)
+    {
+        $affiliate_user = AffiliateUser::where('user_id', Auth::user()->id)->first();
+        if ($affiliate_user->next_withdraw_date_token != null && strtotime($affiliate_user->next_withdraw_date_token) > strtotime(Carbon::now())) {
+            flash(translate('Withdraw not available'))->error();
+            return back();
+        }
+        $partial_balance = (($affiliate_user->balance + $affiliate_user->mlm_balance) * .25) - $affiliate_user->token_withdraw_balance;
+        if ($partial_balance >= $request->amount) {
+            $sellerAccount = User::where('email', $request->transfer_account)->first();
+            $token_transfer = new AffiliateTokenTransfer();
+            $token_transfer->user_id = Auth::user()->id;
+            $token_transfer->amount = $request->amount;
+            $token_transfer->transfer_user_id = $sellerAccount->id;
+            $token_transfer->status = 1;
+            $token_transfer->save();
+
+            $affiliate_user->total_balance = $affiliate_user->total_balance - $request->amount;
+            $affiliate_user->token_withdraw_balance = $affiliate_user->token_withdraw_balance + $request->amount;
+
+            $affiliate_user->next_withdraw_date_token = Carbon::now()->addDays(15);
+            $affiliate_user->save();
+
+            $sellerData = Seller::where('user_id', $sellerAccount->id)->first();
+            $sellerData->token_amount += $request->amount;
+            $sellerData->save();
+        } else {
+            flash(translate('Insufficient Balance'))->error();
+            return back();
+        }
+        flash(translate('New withdraw request created successfully'))->success();
+        return redirect()->route('affiliate.user.token_transfer_history');
+    }
+
 
     public function affiliate_withdraw_requests()
     {
@@ -660,7 +725,7 @@ class AffiliateController extends Controller
         $sales_commission_table = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '=', 1)->paginate(10);
 
-        return view('affiliate.frontend.view_product_sales_commission',compact('sales_commission_table','report'));
+        return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
     }
 
     public function view_mlm_direct_commission()
@@ -669,7 +734,7 @@ class AffiliateController extends Controller
         $sales_commission_table = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '!=', 1)->paginate(10);
 
-        return view('affiliate.frontend.view_product_sales_commission',compact('sales_commission_table','report'));
+        return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
     }
 
 

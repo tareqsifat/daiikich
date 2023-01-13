@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateTokenTransfer;
 use Illuminate\Http\Request;
 use App\Models\SellerWithdrawRequest;
 use App\Models\User;
@@ -23,6 +24,13 @@ class SellerWithdrawRequestController extends Controller
     {
         $seller_withdraw_requests = SellerWithdrawRequest::latest()->paginate(15);
         return view('backend.sellers.seller_withdraw_requests.index', compact('seller_withdraw_requests'));
+    }
+
+    //Token Transfer History
+    public function sellerToken()
+    {
+        $tokens = AffiliateTokenTransfer::latest()->paginate(15);
+        return view('backend.sellers.tokenTransferHistory', compact('tokens'));
     }
 
     /**
