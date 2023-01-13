@@ -78,7 +78,7 @@
                                 <input type="text" class="form-control aiz-tag-input" name="tags[]" id="tags" value="{{ $product->tags }}" placeholder="{{ translate('Type to add a tag') }}" data-role="tagsinput">
                             </div>
                         </div>
-                        
+
                         @if (addon_is_activated('pos_system'))
                         <div class="form-group row">
                             <label class="col-lg-3 col-from-label">{{translate('Barcode')}}</label>
@@ -722,6 +722,39 @@
                         @endforeach
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 h6">Product Wise Affiliate Share</h5>
+{{--                        <h5 class="mb-0 h6">{{$product->rank_qualification}}</h5>--}}
+                    </div>
+                    <div class="card-body">
+{{--                        @if (get_setting('rank_qualification') == '1')--}}
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-6 col-from-label">{{translate('Status')}}</label>
+                                        <div class="col-md-6">
+                                            <label class="aiz-switch aiz-switch-success mb-0">
+                                                <input type="checkbox" name="rank_qualification" value="1" @if($product->rank_qualification == 1) checked @endif>
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+{{--                        @else--}}
+{{--                            <p>--}}
+{{--                                {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}--}}
+{{--                                <a href="{{route('activation.index')}}" class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index','shipping_configuration.edit','shipping_configuration.update'])}}">--}}
+{{--                                    <span class="aiz-side-nav-text">{{translate('Cash Payment Activation')}}</span>--}}
+{{--                                </a>--}}
+{{--                            </p>--}}
+{{--                        @endif--}}
+                    </div>
+                </div>
+
+
 
             </div>
             <div class="col-12">

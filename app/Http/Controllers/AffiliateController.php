@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rank;
 use App\Models\ReferralEarning;
 use Illuminate\Http\Request;
 use App\Models\AffiliateOption;
@@ -660,7 +661,7 @@ class AffiliateController extends Controller
         $sales_commission_table = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '=', 1)->paginate(10);
 
-        return view('affiliate.frontend.view_product_sales_commission',compact('sales_commission_table','report'));
+        return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
     }
 
     public function view_mlm_direct_commission()
@@ -669,8 +670,56 @@ class AffiliateController extends Controller
         $sales_commission_table = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '!=', 1)->paginate(10);
 
-        return view('affiliate.frontend.view_product_sales_commission',compact('sales_commission_table','report'));
+        return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
     }
 
+    public function affiliate_ref_earning()
+    {
+        $ref_earning = ReferralEarning::paginate(10);
+        return view('backend.referral_earning.referral_earning', compact('ref_earning'));
+    }
 
-}
+    public function rank_qualification()
+    {
+        $users = AffiliateUser::all();
+        foreach ($users as $user) {
+            $first_level_sales_volume = AffiliateUser::where('id', $user->first_level_user)->value('total_sale_volume');
+            $first_level_sales_volume *= .04;
+
+            $second_level_sales_volume = AffiliateUser::where('id', $user->second_level_user)->value('total_sale_volume');
+            $second_level_sales_volume *= .02;
+
+            $third_level_sales_volume = AffiliateUser::where('id', $user->third_level_user)->value('total_sale_volume');
+            $third_level_sales_volume *= .01;
+
+            $fourth_level_sales_volume = AffiliateUser::where('id', $user->fourth_level_user)->value('total_sale_volume');
+            $fourth_level_sales_volume *= .005;
+
+            $level_sales_volume = $first_level_sales_volume + $second_level_sales_volume + $third_level_sales_volume + $fourth_level_sales_volume;
+
+            $rank = Rank::where('status', 1)->get();
+            foreach ($rank as $item) {
+                if($level_sales_volume >= $item->sale_volume){
+                    $level_sales_volume = ($level_sales_volume * $item->percentage)/100;
+                }
+            }
+
+                $temp_mlm_balance = AffiliateUser::where('id', $user->id)->value('mlm_balance');
+                $user->mlm_balance = $level_sales_volume + $temp_mlm_balance;
+
+                $temp_total_balance = AffiliateUser::where('id', $user->id)->value('total_balance');
+                $user->total_balance = $level_sales_volume + $temp_total_balance;
+                $user->save();
+
+                $user_id = AffiliateUser::where('id', $user->id)->value('user_id');
+                $info = new ReferralEarning();
+                $info->type = 3;
+                $info->amount = $level_sales_volume;
+                $info->user_id = $user_id;
+                $info->status = 1;
+                $info->save();
+            }
+        }
+
+
+    }

@@ -26,6 +26,10 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
         Route::get('/affiliate/users', 'users')->name('affiliate.users');
         Route::get('/affiliate/verification/{id}', 'show_verification_request')->name('affiliate_users.show_verification_request');
 
+        //Modify here
+        Route::get('/affiliate/ref/earning', 'affiliate_ref_earning')->name('affiliate.ref.earning');
+        Route::get('/affiliate/rank/qualification', 'rank_qualification')->name('rank.qualification');
+
         Route::get('/affiliate/approve/{id}', 'approve_user')->name('affiliate_user.approve');
         Route::get('/affiliate/reject/{id}', 'reject_user')->name('affiliate_user.reject');
 
