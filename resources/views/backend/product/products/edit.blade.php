@@ -730,19 +730,36 @@
                     </div>
                     <div class="card-body">
 {{--                        @if (get_setting('rank_qualification') == '1')--}}
+{{--                        <form method="post" action="{{route('rank.qualification',$product->id)}}">--}}
+{{--                            @csrf--}}
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <div class="form-group row">
                                         <label class="col-md-6 col-from-label">{{translate('Status')}}</label>
                                         <div class="col-md-6">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="checkbox" name="rank_qualification" value="1" @if($product->rank_qualification == 1) checked @endif>
-                                                <span></span>
-                                            </label>
+
+                                            <a href="{{route('product.rank.qualification',['id' => $product->id])}}" class="aiz-switch aiz-switch-success mb-0" onchange="toggleCheckbox(event)">
+                                                <input type="checkbox" class="aiz-switch-input" id="checkbox1" value="1" @if($product->rank_qualification == 1) checked @endif>
+                                                <span class="aiz-switch-label"></span>
+                                            </a>
+
+                                            <script>
+                                                function toggleCheckbox(event) {
+                                                    event.preventDefault();
+                                                    var checkbox = document.getElementById("checkbox1");
+                                                    checkbox.checked = !checkbox.checked;
+                                                }
+                                            </script>
+
+{{--                                            <label class="aiz-switch aiz-switch-success mb-0">--}}
+{{--                                                <input type="checkbox" name="rank_qualification"  onchange="this.form.submit()" value="1" @if($product->rank_qualification == 1) checked @endif>--}}
+{{--                                                <span></span>--}}
+{{--                                            </label>--}}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+{{--                        </form>--}}
 {{--                        @else--}}
 {{--                            <p>--}}
 {{--                                {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}--}}
@@ -771,6 +788,8 @@
 @section('script')
 
 <script type="text/javascript">
+
+
     $(document).ready(function (){
         show_hide_shipping_div();
     });
