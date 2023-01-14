@@ -725,13 +725,12 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0 h6">Product Wise Affiliate Share</h5>
+                        <h5 class="mb-0 h6">Product Wise Rank Qualification</h5>
 {{--                        <h5 class="mb-0 h6">{{$product->rank_qualification}}</h5>--}}
                     </div>
                     <div class="card-body">
 {{--                        @if (get_setting('rank_qualification') == '1')--}}
-{{--                        <form method="post" action="{{route('rank.qualification',$product->id)}}">--}}
-{{--                            @csrf--}}
+
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <div class="form-group row">
@@ -748,6 +747,7 @@
                                                     event.preventDefault();
                                                     var checkbox = document.getElementById("checkbox1");
                                                     checkbox.checked = !checkbox.checked;
+                                                    scorll.bottom();
                                                 }
                                             </script>
 
@@ -759,7 +759,6 @@
                                     </div>
                                 </div>
                             </div>
-{{--                        </form>--}}
 {{--                        @else--}}
 {{--                            <p>--}}
 {{--                                {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}--}}

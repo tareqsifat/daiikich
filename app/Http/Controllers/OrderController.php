@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\AffiliateController;
+use App\Models\AffiliateUser;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Cart;
@@ -35,17 +36,17 @@ class OrderController extends Controller
         $this->middleware(['permission:view_order_details'])->only('show');
         $this->middleware(['permission:delete_order'])->only('destroy');
     }
-    
+
     // All Orders
     public function all_orders(Request $request)
     {
         CoreComponentRepository::instantiateShopRepository();
-        
+
         $date = $request->date;
         $sort_search = null;
         $delivery_status = null;
         $payment_status = '';
-        
+
         $orders = Order::orderBy('id', 'desc');
         $admin_user_id = User::where('user_type', 'admin')->first()->id;
         if(Route::currentRouteName() == 'inhouse_orders.index') {
@@ -160,7 +161,7 @@ class OrderController extends Controller
             $order->shipping_address = $combined_order->shipping_address;
 
             $order->additional_info = $request->additional_info;
-            
+
             //======== Closed By Kiron ==========
             // $order->shipping_type = $carts[0]['shipping_type'];
             // if ($carts[0]['shipping_type'] == 'pickup_point') {
@@ -246,6 +247,19 @@ class OrderController extends Controller
                         $affiliateController->processAffiliateStats($referred_by_user->id, 0, $order_detail->quantity, 0, 0);
                     }
                 }
+
+                //Modify here
+                $referred_user_id = Auth::user()->referred_by;
+                $rank_qualification_status = Product::where('id',$product->id)->first()->value('rank_qualification');
+//                $rank_qualification_status = Product::where('id',$product->id)->value('rank_qualification');
+                if($rank_qualification_status == 1){
+                    if($referred_user_id != null){
+                        $affiliate_user_data = AffiliateUser::where('user_id',$referred_user_id)->first();
+                        $temp_price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+                        $affiliate_user_data->total_sale_volume += $temp_price;
+                        $affiliate_user_data->save();
+                    }
+                }
             }
 
             $order->grand_total = $subtotal + $tax + $shipping;
@@ -268,6 +282,8 @@ class OrderController extends Controller
         $combined_order->save();
 
         $request->session()->put('combined_order_id', $combined_order->id);
+
+
     }
 
     /**
