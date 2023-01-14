@@ -557,4 +557,12 @@ class ProductController extends Controller
         $product->save();
         return back();
     }
+
+    public function product_sharing_cost(Request $request,$id){
+
+        $product = Product::find($id);
+        $product->product_wise_commission = $request->product_wise_commission;
+        $product->save();
+        return back();
+    }
 }

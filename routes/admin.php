@@ -91,6 +91,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
 
         //Modify
         Route::get('/rank/qualification/{id}', 'admin_rank_qualification')->name('product.rank.qualification');
+        Route::post('/product/sharing/cost/{id}', 'product_sharing_cost')->name('product.sharing.cost');
 
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');
