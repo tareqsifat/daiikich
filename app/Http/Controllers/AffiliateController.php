@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AffiliateTokenTransfer;
+use App\Models\Rank;
 use App\Models\ReferralEarning;
 use App\Models\Seller;
 use Illuminate\Http\Request;
@@ -188,11 +189,51 @@ class AffiliateController extends Controller
                 if (Cookie::has('referral_code')) {
                     $referral_code = Cookie::get('referral_code');
                     $referred_by_user = User::where('referral_code', $referral_code)->first();
+
                     if ($referred_by_user != null) {
                         $user->referred_by = $referred_by_user->id;
                     }
+
                 }
                 $user->save();
+
+                if (Cookie::has('referral_code')) {
+                    $referral_code = Cookie::get('referral_code');;
+                    $referred_by_user = User::where('referral_code', $referral_code)->first();
+                    $first_level_user = AffiliateUser::where('user_id', $referred_by_user->id)->first();
+                    if ($first_level_user->first_level_user == null) {
+                        $first_level_user->first_level_user = $user->id;
+                        $first_level_user->save();
+                    }
+                    if ($first_level_user->user->referred_by != null) {
+                        $second_level_user = AffiliateUser::where('user_id', $first_level_user->user->referred_by)->first();
+                        if ($second_level_user->second_level_user == null) {
+                            $second_level_user->second_level_user = $user->id;
+                            $second_level_user->save();
+                        }
+                    }
+                    if ($first_level_user->user->referred_by != null){
+                        if ($second_level_user->user->referred_by != null) {
+                            $third_level_user = AffiliateUser::where('user_id', $second_level_user->user->referred_by)->first();
+                            if ($third_level_user->third_level_user == null) {
+                                $third_level_user->third_level_user = $user->id;
+                                $third_level_user->save();
+                            }
+                        }
+                }
+                    if ($first_level_user->user->referred_by != null && $second_level_user->user->referred_by != null) {
+                        if ($third_level_user->user->referred_by != null) {
+                            $fourth_level_user = AffiliateUser::where('user_id', $third_level_user->user->referred_by)->first();
+
+                            if ($fourth_level_user->fourth_level_user == null) {
+                                $fourth_level_user->fourth_level_user = $user->id;
+                                $fourth_level_user->save();
+                            }
+                        }
+                    }
+
+                }
+
 
                 auth()->login($user, false);
 
@@ -735,6 +776,60 @@ class AffiliateController extends Controller
             ->where('type', '!=', 1)->paginate(10);
 
         return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
+
+    }
+
+    public function affiliate_ref_earning()
+    {
+        $ref_earning = ReferralEarning::paginate(10);
+        return view('backend.referral_earning.referral_earning', compact('ref_earning'));
+    }
+
+    public function rank_qualification()
+    {
+        $users = AffiliateUser::all();
+        foreach ($users as $user) {
+            $first_level_sales_volume = AffiliateUser::where('id', $user->first_level_user)->value('total_sale_volume');
+            $first_level_sales_volume *= .04;
+
+            $second_level_sales_volume = AffiliateUser::where('id', $user->second_level_user)->value('total_sale_volume');
+            $second_level_sales_volume *= .02;
+
+            $third_level_sales_volume = AffiliateUser::where('id', $user->third_level_user)->value('total_sale_volume');
+            $third_level_sales_volume *= .01;
+
+            $fourth_level_sales_volume = AffiliateUser::where('id', $user->fourth_level_user)->value('total_sale_volume');
+            $fourth_level_sales_volume *= .005;
+
+            $level_sales_volume = $first_level_sales_volume + $second_level_sales_volume + $third_level_sales_volume + $fourth_level_sales_volume;
+
+            $rank = Rank::where('status', 1)->get();
+            foreach ($rank as $item) {
+                if ($level_sales_volume >= $item->sale_volume) {
+                    $level_sales_volume = ($level_sales_volume * $item->percentage) / 100;
+                }
+            }
+
+            $temp_mlm_balance = AffiliateUser::where('id', $user->id)->value('mlm_balance');
+            $user->mlm_balance = $level_sales_volume + $temp_mlm_balance;
+
+
+            $temp_total_balance = AffiliateUser::where('id', $user->id)->value('total_balance');
+            $user->total_balance = $level_sales_volume + $temp_total_balance;
+            $user->total_sale_volume = 0;
+            $user->save();
+
+            $user_id = AffiliateUser::where('id', $user->id)->value('user_id');
+            $info = new ReferralEarning();
+            $info->type = 3;
+            $info->amount = $level_sales_volume;
+            $info->user_id = $user_id;
+            $info->status = 1;
+            $info->save();
+            flash(translate('Level Commission Generate Successfully'))->success();
+            return back();
+
+        }
     }
 
 

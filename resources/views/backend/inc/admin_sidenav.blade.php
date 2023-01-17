@@ -795,6 +795,17 @@
                                         </a>
                                     </li>
                                 @endcan
+
+                                @can('view_affiliate_users')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{route('affiliate.ref.earning')}}"
+                                           class="aiz-side-nav-link {{ areActiveRoutes(['affiliate.users', 'affiliate_users.show_verification_request', 'affiliate_user.payment_history'])}}">
+                                            <span class="aiz-side-nav-text">Affiliate Referral Earning</span>
+                                        </a>
+                                    </li>
+                                @endcan
+
+
                                 @can('view_all_referral_users')
                                     <li class="aiz-side-nav-item">
                                         <a href="{{route('refferals.users')}}" class="aiz-side-nav-link">
@@ -806,7 +817,6 @@
                                     <li class="aiz-side-nav-item">
                                         <a href="{{route('affiliate.withdraw_requests')}}" class="aiz-side-nav-link">
                                             <span
-                                                class="aiz-side-nav-text">{{translate('Affiliate Withdraw Requests')}}</span>
                                         </a>
                                     </li>
                                 @endcan
@@ -817,6 +827,7 @@
                                         <a href="{{route('tokenTransferHistory')}}" class="aiz-side-nav-link">
                                             <span
                                                 class="aiz-side-nav-text">{{translate('Token Transfer History')}}</span>
+
                                         </a>
                                     </li>
                                 @endcan
@@ -834,6 +845,14 @@
                                         <span class="aiz-side-nav-text">Affiliate Products</span>
                                     </a>
                                 </li>
+
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('rank.qualification')}}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">Affiliate Commission Generate</span>
+                                    </a>
+                                </li>
+
+
                             </ul>
                         </li>
                     @endcanany
@@ -1078,6 +1097,7 @@
 
             <!-- Setup & Configurations -->
                 @canany(['general_settings','features_activation','language_setup','currency_setup','rank_setup','vat_&_tax_setup',
+
                         'pickup_point_setup','smtp_settings','payment_methods_configurations','order_configuration','file_system_&_cache_configuration',
                         'social_media_logins','facebook_chat','facebook_comment','analytics_tools_configuration','google_recaptcha_configuration','google_map_setting',
                         'google_firebase_setting','shipping_configuration','shipping_country_setting','manage_shipping_states','manage_shipping_cities','manage_zones','manage_carriers'])

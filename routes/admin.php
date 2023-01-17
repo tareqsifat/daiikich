@@ -89,6 +89,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::get('/products/all', 'all_products')->name('products.all');
         Route::get('/products/create', 'create')->name('products.create');
         Route::post('/products/store/', 'store')->name('products.store');
+
+        //Modify
+        Route::get('/rank/qualification/{id}', 'admin_rank_qualification')->name('product.rank.qualification');
+        Route::post('/product/sharing/cost/{id}', 'product_sharing_cost')->name('product.sharing.cost');
+
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');
         Route::post('/products/update/{product}', 'update')->name('products.update');
@@ -231,6 +236,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::post('/currency/currency_edit', 'edit')->name('currency.edit');
         Route::post('/currency/update_status', 'update_status')->name('currency.update_status');
     });
+
 
     //Rank
     Route::controller(RankController::class)->group(function () {

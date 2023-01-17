@@ -394,7 +394,7 @@ class ProductController extends Controller
         $product_new = $product->replicate();
         $product_new->slug = $product_new->slug . '-' . Str::random(5);
         $product_new->save();
-        
+
         //Product Stock
         $this->productStockService->product_duplicate_store($product->stocks, $product_new);
 
@@ -442,7 +442,7 @@ class ProductController extends Controller
         }
 
         $product->save();
-        
+
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
         return 1;
@@ -465,7 +465,7 @@ class ProductController extends Controller
         }
 
         $product->save();
-        
+
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
         return 1;
@@ -543,5 +543,26 @@ class ProductController extends Controller
 
         $combinations = Combinations::makeCombinations($options);
         return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product'));
+    }
+
+    public function admin_rank_qualification($id)
+    {
+        $product = Product::find($id);
+
+        if ($product->rank_qualification == 1){
+            $product->rank_qualification = 0;
+        }else{
+            $product->rank_qualification = 1;
+        }
+        $product->save();
+        return back();
+    }
+
+    public function product_sharing_cost(Request $request,$id){
+
+        $product = Product::find($id);
+        $product->product_wise_commission = $request->product_wise_commission;
+        $product->save();
+        return back();
     }
 }

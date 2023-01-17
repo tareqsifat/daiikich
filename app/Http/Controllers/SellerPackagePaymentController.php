@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateUser;
+use App\Models\ReferralEarning;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\SellerPackagePayment;
 use App\Models\SellerPackage;
@@ -32,6 +36,23 @@ class SellerPackagePaymentController extends Controller
     {
         $package_payment    = SellerPackagePayment::findOrFail($request->id);
         $package_details    = SellerPackage::findOrFail($package_payment->seller_package_id);
+        $user_data = User::find($package_payment->user_id);
+        $user_ref_id = $user_data->referred_by;
+        $affiliate_user = AffiliateUser::where('user_id',$user_ref_id)->first();
+        $tempCommission = ($package_details->amount*25)/100;
+       // dd($tempCommission);
+        $affiliate_user->mlm_balance += $tempCommission;
+        $affiliate_user->total_balance += $tempCommission;
+        $affiliate_user->save();
+        //dd($affiliate_user);
+        $ref_history = new ReferralEarning();
+        $ref_history->type = 2;
+        $ref_history->amount = $tempCommission;
+        $ref_history->user_id = $user_ref_id;
+        $ref_history->created_at = Carbon::now();
+        $ref_history->updated_at = Carbon::now();
+        $ref_history->save();
+
         $package_payment->approval      = $request->status;
         if($package_payment->save()){
             $seller                                 = $package_payment->user->shop;
