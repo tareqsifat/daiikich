@@ -817,10 +817,22 @@
                                     <li class="aiz-side-nav-item">
                                         <a href="{{route('affiliate.withdraw_requests')}}" class="aiz-side-nav-link">
                                             <span
-                                                class="aiz-side-nav-text">{{translate('Affiliate Withdraw Requests')}}</span>
                                         </a>
                                     </li>
                                 @endcan
+
+                                {{-- Token Transfer History --}}
+                                @can('tokenTransferHistory')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{route('tokenTransferHistory')}}" class="aiz-side-nav-link">
+                                            <span
+                                                class="aiz-side-nav-text">{{translate('Token Transfer History')}}</span>
+
+                                        </a>
+                                    </li>
+                                @endcan
+                                {{-- End Token Transfer History --}}
+
                                 @can('view_affiliate_logs')
                                     <li class="aiz-side-nav-item">
                                         <a href="{{route('affiliate.logs.admin')}}" class="aiz-side-nav-link">
@@ -1084,7 +1096,8 @@
                 @endcanany
 
             <!-- Setup & Configurations -->
-                @canany(['general_settings','features_activation','language_setup','currency_setup','vat_&_tax_setup',
+                @canany(['general_settings','features_activation','language_setup','currency_setup','rank_setup','vat_&_tax_setup',
+
                         'pickup_point_setup','smtp_settings','payment_methods_configurations','order_configuration','file_system_&_cache_configuration',
                         'social_media_logins','facebook_chat','facebook_comment','analytics_tools_configuration','google_recaptcha_configuration','google_map_setting',
                         'google_firebase_setting','shipping_configuration','shipping_country_setting','manage_shipping_states','manage_shipping_cities','manage_zones','manage_carriers'])
@@ -1121,6 +1134,13 @@
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('currency.index')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Currency')}}</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('rank_setup')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('rank.index')}}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">{{translate('Rank')}}</span>
                                     </a>
                                 </li>
                             @endcan

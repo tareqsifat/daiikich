@@ -45,6 +45,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\RankController;
 
 /*
   |--------------------------------------------------------------------------
@@ -161,6 +162,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::get('/withdraw_requests_all', 'index')->name('withdraw_requests_all');
         Route::post('/withdraw_request/payment_modal', 'payment_modal')->name('withdraw_request.payment_modal');
         Route::post('/withdraw_request/message_modal', 'message_modal')->name('withdraw_request.message_modal');
+        Route::get('/tokenTransferHistory', 'sellerToken')->name('tokenTransferHistory');
     });
 
     // Customer
@@ -233,6 +235,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::post('/currency/store', 'store')->name('currency.store');
         Route::post('/currency/currency_edit', 'edit')->name('currency.edit');
         Route::post('/currency/update_status', 'update_status')->name('currency.update_status');
+    });
+
+
+    //Rank
+    Route::controller(RankController::class)->group(function () {
+        Route::get('/rank', 'rank')->name('rank.index');
+        Route::post('/rank/update', 'updateRank')->name('rank.update');
+        Route::post('/your-rank/update', 'updateYourRank')->name('your_rank.update');
+        Route::get('/rank/create', 'create')->name('rank.create');
+        Route::post('/rank/store', 'store')->name('rank.store');
+        Route::post('/rank/rank_edit', 'edit')->name('rank.edit');
+        Route::post('/rank/update_status', 'update_status')->name('rank.update_status');
     });
 
     //Tax
@@ -475,6 +489,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
 
     // uploaded files
     Route::resource('/uploaded-files', AizUploadController::class);
+
     Route::controller(AizUploadController::class)->group(function () {
         Route::any('/uploaded-files/file-info', 'file_info')->name('uploaded-files.info');
         Route::get('/uploaded-files/destroy/{id}', 'destroy')->name('uploaded-files.destroy');
