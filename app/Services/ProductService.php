@@ -39,7 +39,7 @@ class ProductService
             $discount_end_date   = strtotime($date_var[1]);
         }
         unset($collection['date_range']);
-        
+
         if ($collection['meta_title'] == null) {
             $collection['meta_title'] = $collection['name'];
         }
@@ -194,7 +194,7 @@ class ProductService
             $discount_end_date   = strtotime($date_var[1]);
         }
         unset($collection['date_range']);
-        
+
         if ($collection['meta_title'] == null) {
             $collection['meta_title'] = $collection['name'];
         }
@@ -205,7 +205,7 @@ class ProductService
         if ($collection['meta_img'] == null) {
             $collection['meta_img'] = $collection['thumbnail_img'];
         }
-        
+
         $shipping_cost = 0;
         if (isset($collection['shipping_type'])) {
             if ($collection['shipping_type'] == 'free') {
@@ -218,7 +218,7 @@ class ProductService
 
         $colors = json_encode(array());
         if (
-            isset($collection['colors_active']) && 
+            isset($collection['colors_active']) &&
             $collection['colors_active'] &&
             $collection['colors'] &&
             count($collection['colors']) > 0
@@ -272,7 +272,7 @@ class ProductService
         }
 
         unset($collection['button']);
-        
+
         $data = $collection->merge(compact(
             'discount_start_date',
             'discount_end_date',
@@ -282,7 +282,7 @@ class ProductService
             'choice_options',
             'attributes',
         ))->toArray();
-        
+
         $product->update($data);
 
         return $product;

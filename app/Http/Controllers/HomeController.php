@@ -562,7 +562,7 @@ class HomeController extends Controller
 
     public function reset_password_with_code(Request $request)
     {
-        
+
         if (($user = User::where('email', $request->email)->where('verification_code', $request->code)->first()) != null) {
             if ($request->password == $request->password_confirmation) {
                 $user->password = Hash::make($request->password);
