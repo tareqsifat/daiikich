@@ -554,6 +554,15 @@
                     </a>
                 </li>
 
+                {{-- Convert History Files --}}
+                <li class="aiz-side-nav-item">
+                    <a href="{{ route('affiliate.convert.history') }}"
+                       class="aiz-side-nav-link">
+                        <i class="las la-folder-open aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">{{ translate('Convert History') }}</span>
+                    </a>
+                </li>
+
                 <!-- Reports -->
                 @canany(['in_house_product_sale_report','seller_products_sale_report','products_stock_report','product_wishlist_report','user_search_report','commission_history_report','wallet_transaction_report'])
                     <li class="aiz-side-nav-item">

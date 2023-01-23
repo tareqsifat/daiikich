@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Models\AffiliateUser;
+use App\Models\TotalConvert;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductTranslation;
@@ -563,6 +565,22 @@ class ProductController extends Controller
         $product = Product::find($id);
         $product->product_wise_commission = $request->product_wise_commission;
         $product->save();
+        return back();
+    }
+
+    public function affiliate_convert_history(){
+        $history = TotalConvert::all();
+        return view('backend.convert_history.total_convert_history',compact('history'));
+    }
+
+    public function total_convert_status_change($id){
+        $res = TotalConvert::where('id',$id)->first();
+        $user = AffiliateUser::where('user_id',$res->user_id)->first();
+        $user->total_convert_balance += $res->balance;
+        $user->save();
+        $res->status = 1;
+        $res->save();
+        flash(translate('Status Updated'))->success();
         return back();
     }
 }

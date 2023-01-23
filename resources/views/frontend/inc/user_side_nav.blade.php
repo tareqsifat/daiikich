@@ -238,6 +238,12 @@
                                         <span class="aiz-side-nav-text">{{ translate('Withdraw request history') }}</span>
                                     </a>
                                 </li>
+
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('affiliate.user.total_convert_history') }}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">{{ translate('Total Convert History') }}</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     @endif

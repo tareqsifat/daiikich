@@ -195,6 +195,13 @@
                     </a>
                 </li>
 
+                <li class="aiz-side-nav-item">
+                    <a href="{{ route('seller.total_convert_history') }}" class="aiz-side-nav-link">
+                        <i class="las la-file-alt aiz-side-nav-icon"></i>
+                        <span class="aiz-side-nav-text">{{ translate('Total Convert History') }}</span>
+                    </a>
+                </li>
+
                 @if (get_setting('conversation_system') == 1)
                     @php
                         $conversation = \App\Models\Conversation::where('sender_id', Auth::user()->id)

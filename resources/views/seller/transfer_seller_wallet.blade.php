@@ -15,7 +15,7 @@
                 </ul>
             </div>
         @endif
-        <form class="form form-horizontal mar-top" action="{{route('products.store')}}" method="POST" enctype="multipart/form-data" id="choice_form">
+        <form class="form form-horizontal mar-top" action="{{route('seller.transfer.wallet')}}" method="POST" enctype="multipart/form-data" id="choice_form">
             <div class="row gutters-5">
                 <div class="col-lg-8">
                     @csrf
@@ -28,13 +28,23 @@
                             <div class="form-group row">
                                 <label class="col-md-3 col-from-label">Wallet Address<span class="text-danger">*</span></label>
                                 <div class="col-md-8">
+                                    <input type="hidden" class="form-control" name="user_id"  value="{{\Illuminate\Support\Facades\Auth::user()->id}}">
                                     <input type="text" class="form-control" name="wallet_address" placeholder="Wallet Address" required>
+                                </div>
+
+                                @php
+                                    $token_balance = \App\Models\Seller::where('user_id',\Illuminate\Support\Facades\Auth::user()->id)->value('token_amount');
+                                @endphp
+                                <label class="col-md-3 mt-3 col-from-label">Available Token Balance<span class="text-danger"></span></label>
+                                <div class="col-md-8 mt-3">
+                                    <input type="text" class="form-control" value="RM {{$token_balance}}" readonly>
                                 </div>
 
                                 <label class="col-md-3 mt-3 col-from-label">Balance<span class="text-danger">*</span></label>
                                 <div class="col-md-8 mt-3">
                                     <input type="text" class="form-control" name="balance" placeholder="Balance" required>
                                 </div>
+
 
                                 <label class="col-md-3 mt-3 col-from-label">Transaction ID<span class="text-danger">*</span></label>
                                 <div class="col-md-8 mt-3">

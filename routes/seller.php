@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AizUploadController;
+use Illuminate\Pagination\Paginator;
 
 //Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user'], 'as' => 'seller.'], function () {
@@ -114,6 +115,13 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/money-withdraw-requests', 'index')->name('money_withdraw_requests.index');
         Route::post('/money-withdraw-request/store', 'store')->name('money_withdraw_request.store');
         Route::get('/transfer/seller/wallet', 'transferSellerWallet')->name('transfer.wallet');
+        Route::post('/transfer/seller/wallet', 'saveTransferSellerWallet')->name('transfer.wallet');
+
+        //Total Convert Request
+        Route::get('/seller/total/convert/history', 'total_convert_history')->name('total_convert_history');
+        Route::get('/total/history/status.approve/{id}', 'total_history_status_approve')->name('total.history.status.approve');
+        Route::get('/total/history/status.reject/{id}', 'total_history_status_reject')->name('total.history.status.reject');
+
     });
 
     // Commission History

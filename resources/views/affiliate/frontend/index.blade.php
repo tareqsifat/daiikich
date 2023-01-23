@@ -61,7 +61,32 @@
                     </div>
 
                     <div class="row gutters-10">
-                        <div class="col-md-6 mx-auto mb-3">
+
+                        <div class="col-md-4 mx-auto mb-3">
+                            <div
+                                class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition"
+                                onclick="show_affiliate_withdraw_modal2()">
+                              <span
+                                  class="size-60px rounded-circle mx-auto bg-secondary d-flex align-items-center justify-content-center mb-3">
+                                  <i class="las la-plus la-3x text-white"></i>
+                              </span>
+                                <div class="fs-18 text-primary">{{  translate('Token Convert Request') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mx-auto mb-3">
+                            <div
+                                class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition"
+                                onclick="show_affiliate_withdraw_modal3()">
+                              <span
+                                  class="size-60px rounded-circle mx-auto bg-secondary d-flex align-items-center justify-content-center mb-3">
+                                  <i class="las la-plus la-3x text-white"></i>
+                              </span>
+                                <div class="fs-18 text-primary">{{  translate('Total Convert Request') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mx-auto mb-3">
                             <a href="{{ route('view.product.sales.commission') }}">
                                 <div
                                     class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition"
@@ -70,30 +95,31 @@
                                   class="size-60px rounded-circle mx-auto bg-secondary d-flex align-items-center justify-content-center mb-3">
                                   <i class="las la-dollar-sign la-3x text-white"></i>
                               </span>
-                                    <div class="fs-18 text-primary">Total Product Sales Commission:</div>
+                                    <div class="fs-18 text-primary">Total Sales Commission:</div>
                                     <div class="fs-18 text-primary"><i
-                                            class="las la-dollar-sign text-primary"></i>{{$total_amount}}</div>
+                                            class="las text-primary"></i>{{single_price(Auth::user()->affiliate_user->balance)}}
+                                    </div>
                                 </div>
                             </a>
                         </div>
+                        <!--Modify End here-->
 
-
-                        <div class="col-md-6 mx-auto mb-3">
+                        <div class="col-md-4 mx-auto mb-3">
                             <a href="{{ route('view.mlm.direct.commission') }}">
-                            <div
-                                class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition"
-                                onclick="">
+                                <div
+                                    class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition"
+                                    onclick="">
                               <span
                                   class="size-60px rounded-circle mx-auto bg-secondary d-flex align-items-center justify-content-center mb-3">
                                   <i class="las la-dollar-sign la-3x text-white"></i>
                               </span>
-                                <div class="fs-18 text-primary">
-                                    Total MLM Commission:
+                                    <div class="fs-18 text-primary">
+                                        Total MLM Commission:
+                                    </div>
+                                    <div class="fs-18 text-primary"><i
+                                            class="las text-primary"></i>{{single_price(Auth::user()->affiliate_user->mlm_balance)}}
+                                    </div>
                                 </div>
-                                <div class="fs-18 text-primary"><i
-                                        class="las la-dollar-sign text-primary"></i>{{$mlm_direct_commission + $level_commission}}
-                                </div>
-                            </div>
                             </a>
                         </div>
 
@@ -453,6 +479,139 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="affiliate_withdraw_modal2" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ translate('Token Transfer') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="" action="{{ route('affiliate.token_transfer.store') }}" method="post">
+                    @csrf
+                    <div class="modal-body gry-bg px-3 pt-3">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Available Token')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="number" readonly class="form-control mb-3" min="1"
+                                       value="{{Auth::user()->affiliate_user->total_convert_balance}}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Amount')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="number" name="amount" class="form-control mb-3" min="1" placeholder="Amount">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Seller Select')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+
+                                @php $sellers = \App\Models\Seller::all(); @endphp
+                                <select  name="seller" id="departmentId" class="form-control mb-3">
+                                    <option value="">Select One</option>
+                                    @foreach($sellers as $seller)
+                                    <option value="{{$seller->user_id}}">{{$seller->user->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Wallet Address:')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <label id="subDepartmentId"><span class="text-danger"></span></label>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Transaction hash')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="text" name="transaction_hash" class="form-control mb-3"  placeholder="Transaction Hash">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group text-right">
+                            <button type="submit"
+                                    class="btn btn-sm btn-primary transition-3d-hover mr-1">{{translate('Confirm')}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="affiliate_withdraw_modal3" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ translate('Total Convert') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form class="" action="{{ route('affiliate.token_convert.store') }}" method="post">
+                    @csrf
+                    <div class="modal-body gry-bg px-3 pt-3">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Available Token')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="number" readonly class="form-control mb-3" min="1"
+                                       value="{{((((Auth::user()->affiliate_user->balance) + (Auth::user()->affiliate_user->mlm_balance))*.25)) - Auth::user()->affiliate_user->total_token_convert_balance}}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Balance')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="number" class="form-control mb-3" min="1" name="balance">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>{{ translate('Wallet Address')}} <span
+                                        class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control mb-3" min="1" name="wallet_address">
+                            </div>
+                        </div>
+
+                        <div class="form-group text-right">
+                            <button type="submit"
+                                    class="btn btn-sm btn-primary transition-3d-hover mr-1">{{translate('Confirm')}}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 
@@ -485,6 +644,15 @@
             $('#affiliate_withdraw_modal').modal('show');
         }
 
+
+        function show_affiliate_withdraw_modal2() {
+            $('#affiliate_withdraw_modal2').modal('show');
+        }
+
+        function show_affiliate_withdraw_modal3() {
+            $('#affiliate_withdraw_modal3').modal('show');
+        }
+
         $(document).on('click', '.fb_share_icon', function (e) {
             e.preventDefault();
             let url = "href=https://www.facebook.com/sharer/sharer.php?u=" + $('.fb_share_link').html() + "%2F&amp;src=sdkpreparse";
@@ -499,5 +667,20 @@
 
             window.open(url, 'sharer', 'toolbar=0,status=0,width=648,height=395');
         });
+
+        $(document).on('change', '#departmentId', function (event) {
+            event.preventDefault();
+            var batchId = $(this).val();
+            if (batchId.length > 0) {
+                $.ajax({
+                    url: '{{ route('seller.search') }}',
+                    data: {'department_id': batchId},
+                })
+                    .done(function (response) {
+                        $('#subDepartmentId').html(response.data);
+                    })
+            }
+        });
+
     </script>
 @endsection

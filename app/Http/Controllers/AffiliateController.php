@@ -7,6 +7,7 @@ use App\Models\BusinessSetting;
 use App\Models\Rank;
 use App\Models\ReferralEarning;
 use App\Models\Seller;
+use App\Models\TotalConvert;
 use Illuminate\Http\Request;
 use App\Models\AffiliateOption;
 use App\Models\Order;
@@ -644,29 +645,30 @@ class AffiliateController extends Controller
     public function token_transfer_store(Request $request)
     {
         $affiliate_user = AffiliateUser::where('user_id', Auth::user()->id)->first();
-        if ($affiliate_user->next_withdraw_date_token != null && strtotime($affiliate_user->next_withdraw_date_token) > strtotime(Carbon::now())) {
-            flash(translate('Withdraw not available'))->error();
-            return back();
-        }
+//        if ($affiliate_user->next_withdraw_date_token != null && strtotime($affiliate_user->next_withdraw_date_token) > strtotime(Carbon::now())) {
+//            flash(translate('Withdraw not available'))->error();
+//            return back();
+//        }
         $partial_balance = (($affiliate_user->balance + $affiliate_user->mlm_balance) * .25) - $affiliate_user->token_withdraw_balance;
         if ($partial_balance >= $request->amount) {
             $sellerAccount = User::where('email', $request->transfer_account)->first();
             $token_transfer = new AffiliateTokenTransfer();
             $token_transfer->user_id = Auth::user()->id;
+            $token_transfer->transaction_hash = $request->transaction_hash;
             $token_transfer->amount = $request->amount;
-            $token_transfer->transfer_user_id = $sellerAccount->id;
-            $token_transfer->status = 1;
+            $token_transfer->transfer_user_id = $request->seller;
+            $token_transfer->status = 0;
             $token_transfer->save();
 
-            $affiliate_user->total_balance = $affiliate_user->total_balance - $request->amount;
+            $affiliate_user->total_convert_balance = $affiliate_user->total_balance - $request->amount;
             $affiliate_user->token_withdraw_balance = $affiliate_user->token_withdraw_balance + $request->amount;
 
             $affiliate_user->next_withdraw_date_token = Carbon::now()->addDays(15);
             $affiliate_user->save();
-
-            $sellerData = Seller::where('user_id', $sellerAccount->id)->first();
-            $sellerData->token_amount += $request->amount;
-            $sellerData->save();
+//
+//            $sellerData = Seller::where('user_id', $sellerAccount->id)->first();
+////            $sellerData->token_amount += $request->amount;
+//            $sellerData->save();
         } else {
             flash(translate('Insufficient Balance'))->error();
             return back();
@@ -674,7 +676,6 @@ class AffiliateController extends Controller
         flash(translate('New withdraw request created successfully'))->success();
         return redirect()->route('affiliate.user.token_transfer_history');
     }
-
 
     public function affiliate_withdraw_requests()
     {
@@ -796,44 +797,44 @@ class AffiliateController extends Controller
         $users = AffiliateUser::all();
         foreach ($users as $user) {
             //For First Level Users
-            $first_level_users = Tree::where('referral_id',$user->user_id)
-                ->where('level_type',1)
+            $first_level_users = Tree::where('referral_id', $user->user_id)
+                ->where('level_type', 1)
                 ->get();
             $first_level_sales_volume = 0;
-            foreach ($first_level_users as $first_level_user){
+            foreach ($first_level_users as $first_level_user) {
                 $temp_first_level_sales_volume = AffiliateUser::where('user_id', $first_level_user->user_id)->value('total_sale_volume');
                 $temp_first_level_sales_volume *= .04;
                 $first_level_sales_volume += $temp_first_level_sales_volume;
             }
 
             //For Second Level Users
-            $second_level_users = Tree::where('referral_id',$user->user_id)
-                ->where('level_type',2)
+            $second_level_users = Tree::where('referral_id', $user->user_id)
+                ->where('level_type', 2)
                 ->get();
             $second_level_sales_volume = 0;
-            foreach ($second_level_users as $second_level_user){
+            foreach ($second_level_users as $second_level_user) {
                 $temp_second_level_sales_volume = AffiliateUser::where('user_id', $second_level_user->user_id)->value('total_sale_volume');
                 $temp_second_level_sales_volume *= .02;
                 $second_level_sales_volume += $temp_second_level_sales_volume;
             }
 
             //For Third Level Users
-            $third_level_users = Tree::where('referral_id',$user->user_id)
-                ->where('level_type',3)
+            $third_level_users = Tree::where('referral_id', $user->user_id)
+                ->where('level_type', 3)
                 ->get();
             $third_level_sales_volume = 0;
-            foreach ($third_level_users as $third_level_user){
+            foreach ($third_level_users as $third_level_user) {
                 $temp_third_level_sales_volume = AffiliateUser::where('user_id', $third_level_user->user_id)->value('total_sale_volume');
                 $temp_third_level_sales_volume *= .01;
                 $third_level_sales_volume += $temp_third_level_sales_volume;
             }
 
             //For Fourth Level Users
-            $fourth_level_users = Tree::where('referral_id',$user->user_id)
-                ->where('level_type',4)
+            $fourth_level_users = Tree::where('referral_id', $user->user_id)
+                ->where('level_type', 4)
                 ->get();
             $fourth_level_sales_volume = 0;
-            foreach ($fourth_level_users as $fourth_level_user){
+            foreach ($fourth_level_users as $fourth_level_user) {
                 $temp_fourth_level_sales_volume = AffiliateUser::where('user_id', $fourth_level_user->user_id)->value('total_sale_volume');
                 $temp_fourth_level_sales_volume *= .01;
                 $fourth_level_sales_volume += $temp_fourth_level_sales_volume;
@@ -881,6 +882,32 @@ class AffiliateController extends Controller
     {
         $affiliate_users = User::where('id', $request->id)->get();
         return view('frontend.user_tree.view_affiliated_user', compact('affiliate_users'));
+    }
+
+    public function seller_search(Request $request)
+    {
+        $data = Seller::where('user_id',$request->department_id)->value('wallet_address');
+        return response()->json(['data' => $data]);
+    }
+
+    public function affiliate_token_convert_store(Request $request)
+    {
+        $token = new TotalConvert();
+        $user = AffiliateUser::where('user_id',Auth::user()->id)->first();
+        $user->total_token_convert_balance += $request->balance;
+        $user->total_balance -= $request->balance;
+        $user->save();
+        $token->balance = $request->balance / 1;
+        $token->user_id = Auth::user()->id;
+        $token->wallet_address = $request->wallet_address;
+        $token->save();
+        return back();
+    }
+
+    public function total_convert_history(){
+        $history = TotalConvert::where('user_id',Auth::user()->id)->get();
+//        $history->paginate(10);
+        return view('affiliate.frontend.total_convert_history',compact('history'));
     }
 }
 

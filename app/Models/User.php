@@ -76,7 +76,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Seller::class);
     }
 
-
     public function staff()
     {
         return $this->hasOne(Staff::class);
@@ -156,5 +155,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function child()
     {
         return $this->hasMany(User::class, 'referred_by', 'id')->with('child');
+    }
+
+    public function total_convert()
+    {
+        return $this->hasMany(TotalConvert::class, "user_id");
+    }
+
+    public function affiliate_token_transfer()
+    {
+        return $this->hasMany(AffiliateTokenTransfer::class, "user_id");
     }
 }

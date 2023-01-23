@@ -93,6 +93,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
         Route::get('/rank/qualification/{id}', 'admin_rank_qualification')->name('product.rank.qualification');
         Route::post('/product/sharing/cost/{id}', 'product_sharing_cost')->name('product.sharing.cost');
 
+        //Modify Convert History
+        Route::get('/affiliate_convert_history', 'affiliate_convert_history')->name('affiliate.convert.history');
+        Route::get('/total/convert/status/change/{id}', 'total_convert_status_change')->name('total.convert.status.change');
+
+
+
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');
         Route::post('/products/update/{product}', 'update')->name('products.update');
