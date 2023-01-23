@@ -153,7 +153,7 @@ class HomeController extends Controller
             flash(translate('Sorry! the action is not permitted in demo '))->error();
             return back();
         }
-
+        $referred_by_user = User::where('referral_code', $request->referral_code)->first();
         $user = Auth::user();
         $user->name = $request->name;
         $user->address = $request->address;
@@ -161,6 +161,7 @@ class HomeController extends Controller
         $user->city = $request->city;
         $user->postal_code = $request->postal_code;
         $user->phone = $request->phone;
+        $user->referred_by = $referred_by_user->id;
 
         if ($request->new_password != null && ($request->new_password == $request->confirm_password)) {
             $user->password = Hash::make($request->new_password);

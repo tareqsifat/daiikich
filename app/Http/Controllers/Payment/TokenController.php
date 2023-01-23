@@ -11,7 +11,7 @@ use App\Models\SellerPackage;
 use Session;
 use Auth;
 
-class WalletController extends Controller
+class TokenController extends Controller
 {
     public function pay(){
 

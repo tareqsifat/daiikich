@@ -52,6 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(AffiliateUser::class);
     }
 
+    public function tree()
+    {
+        return $this->hasOne(Tree::class);
+    }
+
     public function affiliate_withdraw_request()
     {
         return $this->hasMany(AffiliateWithdrawRequest::class);

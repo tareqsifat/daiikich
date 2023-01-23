@@ -130,7 +130,7 @@
                                 </a>
                             </li>
                         @endif
-                    
+
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('wishlists.index') }}" class="aiz-side-nav-link {{ areActiveRoutes(['wishlists.index'])}}">
                                 <i class="la la-heart-o aiz-side-nav-icon"></i>
@@ -153,7 +153,7 @@
                             </a>
                         </li>
                     @endif
-                    
+
                     @if(addon_is_activated('auction'))
                         <li class="aiz-side-nav-item">
                             <a href="javascript:void(0);" class="aiz-side-nav-link">
@@ -241,6 +241,15 @@
                             </ul>
                         </li>
                     @endif
+
+
+                    <li class="aiz-side-nav-item">
+                        <a href="{{ route('tree',['id' => Auth::user()->id]) }}" class="aiz-side-nav-link">
+                            <i class="las la-list-ol aiz-side-nav-icon"></i>
+                            <span class="aiz-side-nav-text">Affiliated History</span>
+                        </a>
+                    </li>
+
 
                     @php
                         $support_ticket = DB::table('tickets')

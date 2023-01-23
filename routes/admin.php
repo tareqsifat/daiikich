@@ -267,6 +267,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
             Route::get('/header', 'header')->name('website.header');
             Route::get('/appearance', 'appearance')->name('website.appearance');
             Route::get('/pages', 'pages')->name('website.pages');
+            Route::get('/default/ref', 'defaultRef')->name('edit.default.ref.code');
+            Route::post('/save/default/ref', 'saveDefaultRef')->name('save.default.ref.code');
         });
 
         // Custom Page

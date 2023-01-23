@@ -55,6 +55,22 @@
                                             </div>
                                         @endif
 
+                                        @php
+                                            if(Cookie::has('referral_code')){
+                                                $referral_code = Cookie::get('referral_code');
+                                            }else{
+                                                  $referral_code=App\Models\BusinessSetting::where('type','default_ref')->value('value');
+                                             }
+                                        @endphp
+
+                                        <div class="form-group">
+                                            <input type="text" class="form-control"
+                                                   value="{{$referral_code}}" name="referred_by">
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>Referral Code</strong>
+                                                </span>
+                                        </div>
+
                                         <div class="form-group">
                                             <input type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{  translate('Password') }}" name="password">
                                             @if ($errors->has('password'))

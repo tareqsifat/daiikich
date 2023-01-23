@@ -13,14 +13,16 @@
                             <a class="text-reset" href="{{ route('home') }}">{{ translate('Home') }}</a>
                         </li>
                         <li class="text-dark fw-600 breadcrumb-item">
-                            <a class="text-reset" href="{{ route('affiliate.apply') }}">"{{ translate('Affiliate') }}"</a>
+                            <a class="text-reset" href="{{ route('affiliate.apply') }}">"{{ translate('Affiliate') }}
+                                "</a>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <form class="" action="{{ route('affiliate.store_affiliate_user') }}" method="POST" enctype="multipart/form-data">
+                    <form class="" action="{{ route('affiliate.store_affiliate_user') }}" method="POST"
+                          enctype="multipart/form-data">
                         @csrf
                         @if (!Auth::check())
                             <div class="card">
@@ -32,7 +34,10 @@
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <div class="input-group input-group--style-1">
-                                                    <input type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" value="{{ old('name') }}" placeholder="{{ translate('Name') }}" name="name">
+                                                    <input type="text"
+                                                           class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                                                           value="{{ old('name') }}"
+                                                           placeholder="{{ translate('Name') }}" name="name">
                                                     <span class="input-group-addon">
                                                         <i class="las la-user"></i>
                                                     </span>
@@ -45,7 +50,10 @@
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <div class="input-group input-group--style-1">
-                                                    <input type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" value="{{ old('email') }}" placeholder="{{ translate('Email') }}" name="email">
+                                                    <input type="email"
+                                                           class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}"
+                                                           value="{{ old('email') }}"
+                                                           placeholder="{{ translate('Email') }}" name="email">
                                                     <span class="input-group-addon">
                                                         <i class="las la-envelope"></i>
                                                     </span>
@@ -58,7 +66,9 @@
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <div class="input-group input-group--style-1">
-                                                    <input type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ translate('Password') }}" name="password">
+                                                    <input type="password"
+                                                           class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}"
+                                                           placeholder="{{ translate('Password') }}" name="password">
                                                     <span class="input-group-addon">
                                                         <i class="las la-lock"></i>
                                                     </span>
@@ -71,7 +81,9 @@
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <div class="input-group input-group--style-1">
-                                                    <input type="password" class="form-control" placeholder="{{ translate('Confirm Password') }}" name="password_confirmation">
+                                                    <input type="password" class="form-control"
+                                                           placeholder="{{ translate('Confirm Password') }}"
+                                                           name="password_confirmation">
                                                     <span class="input-group-addon">
                                                         <i class=" las la-lock"></i>
                                                     </span>
@@ -79,9 +91,37 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    @php
+                                        if(Cookie::has('referral_code'))
+                                            {
+                                                $referral_code = Cookie::get('referral_code');
+                                            }
+                                        else
+                                            {
+                                                $referral_code=App\Models\BusinessSetting::where('type','default_ref')->value('value');
+                                            }
+                                    @endphp
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <div class="input-group input-group--style-1">
+                                                    <input type="text" class="form-control"
+                                                           placeholder="{{ translate('Ref') }}"
+                                                           name="referred_by" value="{{$referral_code}}" readonly>
+                                                    <span class="input-group-addon">
+                                                        <i class="las la-lock"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         @endif
+
+
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="mb-0 h6">{{translate('Verification info')}}</h5>
@@ -90,70 +130,81 @@
                                 @php
                                     $verification_form = \App\Models\AffiliateConfig::where('type', 'verification_form')->first()->value;
                                 @endphp
-                                    @foreach (json_decode($verification_form) as $key => $element)
-                                        @if ($element->type == 'text')
-                                            <div class="row">
-                                                <label class="col-md-2 col-form-label">{{ $element->label }} <span class="text-danger">*</span></label>
-                                                <div class="col-md-10">
-                                                    <input type="{{ $element->type }}" class="form-control mb-3" placeholder="{{ $element->label }}" name="element_{{ $key }}" required>
-                                                </div>
+                                @foreach (json_decode($verification_form) as $key => $element)
+                                    @if ($element->type == 'text')
+                                        <div class="row">
+                                            <label class="col-md-2 col-form-label">{{ $element->label }} <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="col-md-10">
+                                                <input type="{{ $element->type }}" class="form-control mb-3"
+                                                       placeholder="{{ $element->label }}" name="element_{{ $key }}"
+                                                       required>
                                             </div>
-                                        @elseif($element->type == 'file')
-                                            <div class="row">
-                                                <label class="col-md-2 col-form-label">{{ $element->label }}</label>
-                                                <div class="col-md-10">
-                                                    <input type="{{ $element->type }}" name="element_{{ $key }}" id="file-{{ $key }}" class="custom-input-file custom-input-file--4" data-multiple-caption="{count} files selected" required/>
-                                                    <label for="file-{{ $key }}" class="mw-100 mb-3">
-                                                        <span></span>
-                                                        <strong>
-                                                            <i class="fa fa-upload"></i>
-                                                            {{translate('Choose file')}}
-                                                        </strong>
-                                                    </label>
-                                                </div>
+                                        </div>
+                                    @elseif($element->type == 'file')
+                                        <div class="row">
+                                            <label class="col-md-2 col-form-label">{{ $element->label }}</label>
+                                            <div class="col-md-10">
+                                                <input type="{{ $element->type }}" name="element_{{ $key }}"
+                                                       id="file-{{ $key }}"
+                                                       class="custom-input-file custom-input-file--4"
+                                                       data-multiple-caption="{count} files selected" required/>
+                                                <label for="file-{{ $key }}" class="mw-100 mb-3">
+                                                    <span></span>
+                                                    <strong>
+                                                        <i class="fa fa-upload"></i>
+                                                        {{translate('Choose file')}}
+                                                    </strong>
+                                                </label>
                                             </div>
-                                        @elseif ($element->type == 'select' && is_array(json_decode($element->options)))
-                                            <div class="row">
-                                                <label class="col-md-2 col-form-label">{{ $element->label }}</label>
-                                                <div class="col-md-10">
-                                                    <div class="mb-3">
-                                                        <select class="form-control selectpicker" data-minimum-results-for-search="Infinity" name="element_{{ $key }}" required>
-                                                            @foreach (json_decode($element->options) as $value)
-                                                                <option value="{{ $value }}">{{ $value }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @elseif ($element->type == 'multi_select' && is_array(json_decode($element->options)))
-                                            <div class="row">
-                                                <label class="col-md-2 col-form-label">{{ $element->label }}</label>
-                                                <div class="col-md-10">
-                                                    <div class="mb-3">
-                                                        <select class="form-control selectpicker" data-minimum-results-for-search="Infinity" name="element_{{ $key }}[]" multiple required>
-                                                            @foreach (json_decode($element->options) as $value)
-                                                                <option value="{{ $value }}">{{ $value }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @elseif ($element->type == 'radio')
-                                            <div class="row">
-                                                <label class="col-md-2 col-form-label">{{ $element->label }}</label>
-                                                <div class="col-md-10">
-                                                    <div class="mb-3">
+                                        </div>
+                                    @elseif ($element->type == 'select' && is_array(json_decode($element->options)))
+                                        <div class="row">
+                                            <label class="col-md-2 col-form-label">{{ $element->label }}</label>
+                                            <div class="col-md-10">
+                                                <div class="mb-3">
+                                                    <select class="form-control selectpicker"
+                                                            data-minimum-results-for-search="Infinity"
+                                                            name="element_{{ $key }}" required>
                                                         @foreach (json_decode($element->options) as $value)
-                                                            <div class="radio radio-inline">
-                                                                <input type="radio" name="element_{{ $key }}" value="{{ $value }}" id="{{ $value }}" required>
-                                                                <label for="{{ $value }}">{{ $value }}</label>
-                                                            </div>
+                                                            <option value="{{ $value }}">{{ $value }}</option>
                                                         @endforeach
-                                                    </div>
+                                                    </select>
                                                 </div>
                                             </div>
-                                        @endif
-                                    @endforeach
+                                        </div>
+                                    @elseif ($element->type == 'multi_select' && is_array(json_decode($element->options)))
+                                        <div class="row">
+                                            <label class="col-md-2 col-form-label">{{ $element->label }}</label>
+                                            <div class="col-md-10">
+                                                <div class="mb-3">
+                                                    <select class="form-control selectpicker"
+                                                            data-minimum-results-for-search="Infinity"
+                                                            name="element_{{ $key }}[]" multiple required>
+                                                        @foreach (json_decode($element->options) as $value)
+                                                            <option value="{{ $value }}">{{ $value }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @elseif ($element->type == 'radio')
+                                        <div class="row">
+                                            <label class="col-md-2 col-form-label">{{ $element->label }}</label>
+                                            <div class="col-md-10">
+                                                <div class="mb-3">
+                                                    @foreach (json_decode($element->options) as $value)
+                                                        <div class="radio radio-inline">
+                                                            <input type="radio" name="element_{{ $key }}"
+                                                                   value="{{ $value }}" id="{{ $value }}" required>
+                                                            <label for="{{ $value }}">{{ $value }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
                         </div>
                         <div class="form-group mb-0 text-right">

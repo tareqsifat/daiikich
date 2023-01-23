@@ -1079,6 +1079,12 @@
                                     </a>
                                 </li>
                             @endcan
+
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{ route('edit.default.ref.code') }}" class="aiz-side-nav-link">
+                                        <span class="aiz-side-nav-text">Edit Default Ref. Code</span>
+                                    </a>
+                                </li>
                         </ul>
                     </li>
                 @endcanany

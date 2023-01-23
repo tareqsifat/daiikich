@@ -86,18 +86,22 @@ class ShopController extends Controller
                 return back();
             }
             if ($request->password == $request->password_confirmation) {
+                $referred_by_user = User::where('referral_code', $request->referral_code)->first();
                 $user = new User;
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->user_type = "seller";
                 $user->password = Hash::make($request->password);
-                if(Cookie::has('referral_code')){
-                    $referral_code = Cookie::get('referral_code');
-                    $referred_by_user = User::where('referral_code', $referral_code)->first();
-                    if($referred_by_user != null){
-                        $user->referred_by = $referred_by_user->id;
-                    }
-                }
+                $user->referred_by = $referred_by_user->id;
+
+//                if(Cookie::has('referral_code')){
+//                    $referral_code = Cookie::get('referral_code');
+//                    $referred_by_user = User::where('referral_code', $referral_code)->first();
+//                    if($referred_by_user != null){
+//                        $user->referred_by = $referred_by_user->id;
+//                    }
+//                }
+
                 $user->save();
             } else {
                 flash(translate('Sorry! Password did not match.'))->error();

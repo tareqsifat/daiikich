@@ -57,7 +57,11 @@
     @endif
     <link rel="stylesheet" href="{{ static_asset('assets/css/aiz-core.css') }}">
     <link rel="stylesheet" href="{{ static_asset('assets/css/custom-style.css') }}">
-
+    <style>
+        #nav-bar:hover{
+            color: #FF8B13;
+        }
+    </style>
 
     <script>
         var AIZ = AIZ || {};
@@ -487,7 +491,7 @@
                 AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to add products to the Cart.') }}");
                 return false;
             @endif
-            
+
             if(checkAddToCartValidity()) {
                 $('#addToCart-modal-body').html(null);
                 $('#addToCart').modal();

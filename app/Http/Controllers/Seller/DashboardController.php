@@ -18,8 +18,10 @@ class DashboardController extends Controller
                                 ->where('delivery_status', '=', 'delivered')
                                 ->select(DB::raw("sum(grand_total) as total, DATE_FORMAT(created_at, '%d %b') as date"))
                                 ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))
-                                ->get()->pluck('total', 'date');  
+                                ->get()->pluck('total', 'date');
 
         return view('seller.dashboard', $data);
     }
+
+
 }

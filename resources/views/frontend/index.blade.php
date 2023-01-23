@@ -163,6 +163,17 @@
     </section>
     @endif
 
+    <div id="section_newest">
+            <section class="mb-4">
+                <div class="container">
+                    <div class="px-2 py-4 px-md-4 py-md-3 shadow-sm rounded" style="background-color: #e8330f; color: white">
+                        <h1 class="text-center"> {{100 - \App\Models\Seller::count()}}</h1>
+                        <h3 class="text-center">Free Seller Registration Left</h3>
+                    </div>
+                </div>
+            </section>
+    </div>
+
 
     <div id="section_newest">
         @if (count($newest_products) > 0)
@@ -185,7 +196,7 @@
                         </div>
                     </div>
                 </div>
-            </section>   
+            </section>
         @endif
     </div>
 

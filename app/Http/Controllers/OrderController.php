@@ -254,15 +254,18 @@ class OrderController extends Controller
                 if($rank_qualification_status == 1){
                     if($referred_user_id != null){
                         $affiliate_user_data = AffiliateUser::where('user_id',$referred_user_id)->first();
-                        $temp_price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+                        if ($affiliate_user_data != null){
+                            $temp_price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
 
-                        $product_wise_commission = Product::where('id',$product->id)->first()->value('product_wise_commission');
-                        $total_percentage = ($temp_price * $product_wise_commission)/100;
+                            $product_wise_commission = Product::where('id',$product->id)->first()->value('product_wise_commission');
+                            $total_percentage = ($temp_price * $product_wise_commission)/100;
 
-                        $affiliate_user_data->total_sale_volume += $temp_price;
+                            $affiliate_user_data->total_sale_volume += $temp_price;
 
-                        $affiliate_user_data->balance += $total_percentage;
-                        $affiliate_user_data->save();
+                            $affiliate_user_data->balance += $total_percentage;
+                            $affiliate_user_data->save();
+                        }
+
 
                     }
                 }

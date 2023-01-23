@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateUser;
 use App\Utility\PayfastUtility;
 use Illuminate\Http\Request;
 use App\Models\Category;
@@ -17,6 +18,7 @@ use App\Utility\PayhereUtility;
 use App\Utility\NotificationUtility;
 use Session;
 use Auth;
+use function Ramsey\Collection\Map\get;
 
 class CheckoutController extends Controller
 {
@@ -32,7 +34,7 @@ class CheckoutController extends Controller
         // Minumum order amount check
         if(get_setting('minimum_order_amount_check') == 1){
             $subtotal = 0;
-            foreach (Cart::where('user_id', Auth::user()->id)->get() as $key => $cartItem){ 
+            foreach (Cart::where('user_id', Auth::user()->id)->get() as $key => $cartItem){
                 $product = Product::find($cartItem['product_id']);
                 $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
             }
@@ -41,21 +43,30 @@ class CheckoutController extends Controller
                 return redirect()->route('home');
             }
         }
-        // Minumum order amount check end
-        
+        // Minimum order amount check end
+
         if ($request->payment_option != null) {
             (new OrderController)->store($request);
 
-            $request->session()->put('payment_type', 'cart_payment');
-            
+            if($request->payment_option=='token')
+            {
+                $request->session()->put('token_type', 'token_payment');
+
+            }
+            if($request->payment_option=='wallet')
+            {
+                $request->session()->put('payment_type', 'cart_payment');
+            }
+
+
             $data['combined_order_id'] = $request->session()->get('combined_order_id');
             $request->session()->put('payment_data', $data);
 
             if ($request->session()->get('combined_order_id') != null) {
-
                 // If block for Online payment, wallet and cash on delivery. Else block for Offline payment
                 $decorator = __NAMESPACE__ . '\\Payment\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $request->payment_option))) . "Controller";
                 if (class_exists($decorator)) {
+
                     return (new $decorator)->pay($request);
                 }
                 else {
@@ -139,7 +150,7 @@ class CheckoutController extends Controller
             })->orWhere('free_shipping', 1);
             $carrier_list = $carrier_query->get();
         }
-        
+
         return view('frontend.delivery_info', compact('carts','carrier_list'));
     }
 
@@ -211,12 +222,12 @@ class CheckoutController extends Controller
                                     ->get();
 
                     $coupon_discount = 0;
-                    
+
                     if ($coupon->type == 'cart_base') {
                         $subtotal = 0;
                         $tax = 0;
                         $shipping = 0;
-                        foreach ($carts as $key => $cartItem) { 
+                        foreach ($carts as $key => $cartItem) {
                             $product = Product::find($cartItem['product_id']);
                             $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
                             $tax += cart_product_tax($cartItem, $product,false) * $cartItem['quantity'];
@@ -235,7 +246,7 @@ class CheckoutController extends Controller
 
                         }
                     } elseif ($coupon->type == 'product_base') {
-                        foreach ($carts as $key => $cartItem) { 
+                        foreach ($carts as $key => $cartItem) {
                             $product = Product::find($cartItem['product_id']);
                             foreach ($coupon_details as $key => $coupon_detail) {
                                 if ($coupon_detail->product_id == $cartItem['product_id']) {
@@ -266,7 +277,7 @@ class CheckoutController extends Controller
                         $response_message['response'] = 'warning';
                         $response_message['message'] = translate('This coupon is not applicable to your cart products!');
                     }
-                    
+
                 } else {
                     $response_message['response'] = 'warning';
                     $response_message['message'] = translate('You already used this coupon!');
@@ -338,11 +349,12 @@ class CheckoutController extends Controller
 
         //Session::forget('club_point');
         //Session::forget('combined_order_id');
-        
+
         foreach($combined_order->orders as $order){
             NotificationUtility::sendOrderPlacedNotification($order);
         }
 
         return view('frontend.order_confirmed', compact('combined_order'));
     }
+
 }

@@ -24,7 +24,7 @@
                 @if($affiliate_user->user != null)
                     <tr>
                         <td>{{ ($key+1) + ($affiliate_users->currentPage() - 1)*$affiliate_users->perPage() }}</td>
-                        <td>{{$affiliate_user->user->name}}</td>
+                        <td><a href="{{route('tree',['id' => $affiliate_user->id])}}">{{$affiliate_user->user->name}}</a></td>
                         <td>{{$affiliate_user->user->phone}}</td>
                         <td>{{$affiliate_user->user->email}}</td>
                         <td>

@@ -30,6 +30,7 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
         Route::get('/affiliate/ref/earning', 'affiliate_ref_earning')->name('affiliate.ref.earning');
         Route::get('/affiliate/rank/qualification', 'rank_qualification')->name('rank.qualification');
 
+
         Route::get('/affiliate/approve/{id}', 'approve_user')->name('affiliate_user.approve');
         Route::get('/affiliate/reject/{id}', 'reject_user')->name('affiliate_user.reject');
 
@@ -71,7 +72,8 @@ Route::group(['middleware' => ['auth']], function(){
         //Modify here
         Route::get('/affiliate/user/view_product_sales_commission', 'view_product_sales_commission')->name('view.product.sales.commission');
         Route::get('/affiliate/user/view_mlm_direct_commission', 'view_mlm_direct_commission')->name('view.mlm.direct.commission');
-
+        Route::get('/affiliate/tree/{id}', 'tree')->name('tree');
+        Route::post('/affiliate/user/info/', 'view_affiliated_user_info')->name('view.affiliated.user.info');
 
         Route::get('/affiliate/payment/settings', 'payment_settings')->name('affiliate.payment_settings');
         Route::post('/affiliate/payment/settings/store', 'payment_settings_store')->name('affiliate.payment_settings_store');

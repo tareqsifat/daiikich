@@ -43,4 +43,8 @@ class SellerWithdrawRequestController extends Controller
             return back();
         }
     }
+
+    public function transferSellerWallet(){
+        return view('seller.transfer_seller_wallet');
+    }
 }

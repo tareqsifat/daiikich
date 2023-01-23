@@ -1,7 +1,7 @@
 <?php
 
 
-Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function() {
+Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function () {
     Route::post('login', 'App\Http\Controllers\Api\V2\AuthController@login');
     Route::post('signup', 'App\Http\Controllers\Api\V2\AuthController@signup');
     Route::post('social-login', 'App\Http\Controllers\Api\V2\AuthController@socialLogin');
@@ -16,7 +16,7 @@ Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function
     Route::post('confirm_code', 'App\Http\Controllers\Api\V2\AuthController@confirmCode');
 });
 
-Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function() {
+Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::prefix('delivery-boy')->group(function () {
         Route::get('dashboard-summary/{id}', 'App\Http\Controllers\Api\V2\DeliveryBoyController@dashboard_summary')->middleware('auth:sanctum');
         Route::get('deliveries/completed/{id}', 'App\Http\Controllers\Api\V2\DeliveryBoyController@completed_delivery')->middleware('auth:sanctum');
@@ -113,7 +113,6 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function() {
     Route::get('get-home-delivery-address', 'App\Http\Controllers\Api\V2\AddressController@getShippingInCart')->middleware('auth:sanctum');
     Route::post('shipping_cost', 'App\Http\Controllers\Api\V2\ShippingController@shipping_cost')->middleware('auth:sanctum');
     Route::post('carriers', 'App\Http\Controllers\Api\V2\CarrierController@index')->middleware('auth:sanctum');
-
 
 
     Route::get('payment-types', 'App\Http\Controllers\Api\V2\PaymentTypesController@getList');
@@ -229,7 +228,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function() {
     Route::get('profile/counters', 'App\Http\Controllers\Api\V2\ProfileController@counters')->middleware('auth:sanctum');
 
     Route::post('profile/update', 'App\Http\Controllers\Api\V2\ProfileController@update')->middleware('auth:sanctum');
-    
+
     Route::post('profile/update-device-token', 'App\Http\Controllers\Api\V2\ProfileController@update_device_token')->middleware('auth:sanctum');
     Route::post('profile/update-image', 'App\Http\Controllers\Api\V2\ProfileController@updateImage')->middleware('auth:sanctum');
     Route::post('profile/image-upload', 'App\Http\Controllers\Api\V2\ProfileController@imageUpload')->middleware('auth:sanctum');
@@ -249,14 +248,14 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function() {
     Route::get('addon-list', 'App\Http\Controllers\Api\V2\ConfigController@addon_list');
     //Activated social login list
     Route::get('activated-social-login', 'App\Http\Controllers\Api\V2\ConfigController@activated_social_login');
-    
+
     //Business Sttings list
     Route::post('business-settings', 'App\Http\Controllers\Api\V2\ConfigController@business_settings');
     //Pickup Point list
     Route::get('pickup-list', 'App\Http\Controllers\Api\V2\ShippingController@pickup_list');
 });
 
-Route::fallback(function() {
+Route::fallback(function () {
     return response()->json([
         'data' => [],
         'success' => false,

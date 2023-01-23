@@ -179,7 +179,7 @@
                     $date = date('Y-m-d');
                     $days_ago_30 = date('Y-m-d', strtotime('-30 days', strtotime($date)));
                     $days_ago_60 = date('Y-m-d', strtotime('-60 days', strtotime($date)));
-                    
+
                     $orderTotal = \App\Models\Order::where('seller_id', Auth::user()->id)
                         ->where('payment_status', 'paid')
                         ->where('created_at', '>=', $days_ago_30)
@@ -531,6 +531,24 @@
                     {{ translate('Configure Now') }}
                 </a>
             </div>
+        </div>
+
+        <div class="col-sm-6 col-md-6 col-lg-3">
+            <a href="{{ route('seller.transfer.wallet') }}" class="card mb-4 p-4 text-center h-180px">
+                <div class="fs-16 fw-600 text-primary">
+                    Transfer Wallet
+                </div>
+                <div class="m-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+                        <g id="Group_22724" data-name="Group 22724" transform="translate(-1284 -875)">
+                            <rect id="Rectangle_17080" data-name="Rectangle 17080" width="2" height="48" rx="1"
+                                  transform="translate(1307 875)" fill="#2E294E" />
+                            <rect id="Rectangle_17081" data-name="Rectangle 17081" width="2" height="48" rx="1"
+                                  transform="translate(1332 898) rotate(90)" fill="#2E294E" />
+                        </g>
+                    </svg>
+                </div>
+            </a>
         </div>
     </div>
 

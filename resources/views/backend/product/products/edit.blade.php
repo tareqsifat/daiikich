@@ -834,7 +834,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" style="background-color: #0abb75; color: white">
                         <div class="card-header">
                             <h5 class="mb-0 h6">Product Wise Rank Qualification</h5>
                             {{--                        <h5 class="mb-0 h6">{{$product->rank_qualification}}</h5>--}}

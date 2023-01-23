@@ -72,8 +72,8 @@
                         <li class="list-inline-item mr-3 border-right border-left-0 pr-3 pl-0">
                             <a href="tel:{{ get_setting('helpline_number') }}" class="text-reset d-inline-block opacity-60 py-2">
                                 <i class="la la-phone"></i>
-                                <span>{{ translate('Help line')}}</span>  
-                                <span>{{ get_setting('helpline_number') }}</span>    
+                                <span>{{ translate('Help line')}}</span>
+                                <span>{{ get_setting('helpline_number') }}</span>
                             </a>
                         </li>
                     @endif
@@ -272,8 +272,8 @@
             <div class="container">
                 <ul class="list-inline mb-0 pl-0 mobile-hor-swipe text-center">
                     @foreach (json_decode( get_setting('header_menu_labels'), true) as $key => $value)
-                    <li class="list-inline-item mr-0">
-                        <a href="{{ json_decode( get_setting('header_menu_links'), true)[$key] }}" class="opacity-60 fs-14 px-3 py-2 d-inline-block fw-600 hov-opacity-100 text-reset">
+                    <li class="list-inline-item mr-0" id="nav-bar">
+                        <a id="top-nav-bar" href="{{ json_decode( get_setting('header_menu_links'), true)[$key] }}" class="opacity-60 fs-14 px-3 py-2 d-inline-block fw-600 hov-opacity-100 text-reset ">
                             {{ translate($value) }}
                         </a>
                     </li>
@@ -296,7 +296,7 @@
 
 @section('script')
     <script type="text/javascript">
-        
+
         function show_order_details(order_id)
         {
             $('#order-details-modal-body').html(null);

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateTokenTransfer;
+use App\Models\BusinessSetting;
 use App\Models\Rank;
 use App\Models\ReferralEarning;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use App\Models\AffiliateOption;
 use App\Models\Order;
@@ -16,6 +19,7 @@ use App\Models\AffiliateStats;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Tree;
 use App\Models\Product;
 use Auth;
 use DB;
@@ -179,59 +183,59 @@ class AffiliateController extends Controller
                 return back();
             }
             if ($request->password == $request->password_confirmation) {
+
+
+                $referred_by_user = User::where('referral_code', $request->referral_code)->first();
                 $user = new User;
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->user_type = "customer";
                 $user->password = Hash::make($request->password);
-                if (Cookie::has('referral_code')) {
-                    $referral_code = Cookie::get('referral_code');
-                    $referred_by_user = User::where('referral_code', $referral_code)->first();
+                $user->referred_by = $referred_by_user->id;
 
-                    if ($referred_by_user != null) {
-                        $user->referred_by = $referred_by_user->id;
-                    }
-
-                }
                 $user->save();
 
                 if (Cookie::has('referral_code')) {
                     $referral_code = Cookie::get('referral_code');;
                     $referred_by_user = User::where('referral_code', $referral_code)->first();
-                    $first_level_user = AffiliateUser::where('user_id', $referred_by_user->id)->first();
-                    if ($first_level_user->first_level_user == null) {
-                        $first_level_user->first_level_user = $user->id;
-                        $first_level_user->save();
+
+                    $tree = new Tree();
+                    $tree->user_id = $user->id;
+                    $tree->referral_id = $referred_by_user->id;
+                    $tree->level_type = 1;
+                    $tree->save();
+
+
+                    if ($referred_by_user->referred_by != null) {
+                        $second_level_user = User::where('id', $referred_by_user->referred_by)->first();
+
+                        $tree = new Tree();
+                        $tree->user_id = $user->id;
+                        $tree->referral_id = $second_level_user->id;
+                        $tree->level_type = 2;
+                        $tree->save();
+
                     }
-                    if ($first_level_user->user->referred_by != null) {
-                        $second_level_user = AffiliateUser::where('user_id', $first_level_user->user->referred_by)->first();
-                        if ($second_level_user->second_level_user == null) {
-                            $second_level_user->second_level_user = $user->id;
-                            $second_level_user->save();
-                        }
+                    if ($referred_by_user->referred_by != null && $second_level_user->referred_by != null) {
+
+                        $third_level_user = User::where('id', $second_level_user->referred_by)->first();
+                        $tree = new Tree();
+                        $tree->user_id = $user->id;
+                        $tree->referral_id = $third_level_user->id;
+                        $tree->level_type = 3;
+                        $tree->save();
+
                     }
-                    if ($first_level_user->user->referred_by != null){
-                        if ($second_level_user->user->referred_by != null) {
-                            $third_level_user = AffiliateUser::where('user_id', $second_level_user->user->referred_by)->first();
-                            if ($third_level_user->third_level_user == null) {
-                                $third_level_user->third_level_user = $user->id;
-                                $third_level_user->save();
-                            }
-                        }
+                    if ($referred_by_user->referred_by != null && $second_level_user->referred_by != null && $third_level_user->referred_by != null) {
+                        $fourth_level_user = User::where('id', $third_level_user->referred_by)->first();
+                        $tree = new Tree();
+                        $tree->user_id = $user->id;
+                        $tree->referral_id = $fourth_level_user->id;
+                        $tree->level_type = 4;
+                        $tree->save();
+
+                    }
                 }
-                    if ($first_level_user->user->referred_by != null && $second_level_user->user->referred_by != null) {
-                        if ($third_level_user->user->referred_by != null) {
-                            $fourth_level_user = AffiliateUser::where('user_id', $third_level_user->user->referred_by)->first();
-
-                            if ($fourth_level_user->fourth_level_user == null) {
-                                $fourth_level_user->fourth_level_user = $user->id;
-                                $fourth_level_user->save();
-                            }
-                        }
-                    }
-
-                }
-
 
                 auth()->login($user, false);
 
@@ -248,9 +252,11 @@ class AffiliateController extends Controller
         }
 
         $affiliate_user = Auth::user()->affiliate_user;
+
         if ($affiliate_user == null) {
             $affiliate_user = new AffiliateUser;
             $affiliate_user->user_id = Auth::user()->id;
+
         }
         $data = array();
         $i = 0;
@@ -282,6 +288,8 @@ class AffiliateController extends Controller
             return redirect()->route('home');
         }
 
+        //Modify here
+        Cookie::forget('referral_code');
         flash(translate('Sorry! Something went wrong.'))->error();
         return back();
     }
@@ -349,6 +357,9 @@ class AffiliateController extends Controller
 
         $affiliate_user = AffiliateUser::findOrFail($request->affiliate_user_id);
         $affiliate_user->balance -= $request->amount;
+
+//        $affiliate_user->mlm_balance += $request->amount;
+
         $affiliate_user->save();
 
         flash(translate('Payment completed'))->success();
@@ -395,6 +406,8 @@ class AffiliateController extends Controller
         $level_commission = ReferralEarning::where('user_id', '=', Auth::user()->id)
             ->where('type', '=', 3)->sum('amount');
 
+        //Total MLM Commission
+        $total_mlm = $mlm_direct_commission + $level_commission;
 
         return view('affiliate.frontend.index',
             compact('affiliate_logs', 'affliate_stats', 'type', 'total_amount', 'mlm_direct_commission', 'level_commission'));
@@ -416,6 +429,14 @@ class AffiliateController extends Controller
         $affiliate_withdraw_requests = AffiliateWithdrawRequest::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
 
         return view('affiliate.frontend.withdraw_request_history', compact('affiliate_withdraw_requests'));
+    }
+
+    public function user_token_transfer_history()
+    {
+        $affiliate_user = Auth::user()->affiliate_user;
+        $affiliate_token_transfer = AffiliateTokenTransfer::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+
+        return view('affiliate.frontend.token_transfer_history', compact('affiliate_token_transfer'));
     }
 
     public function payment_settings()
@@ -591,11 +612,25 @@ class AffiliateController extends Controller
         $withdraw_request->amount = $request->amount;
         $withdraw_request->status = 0;
 
-        if ($withdraw_request->save()) {
 
+        if ($withdraw_request->save()) {
             $affiliate_user = AffiliateUser::where('user_id', Auth::user()->id)->first();
-            $affiliate_user->balance = $affiliate_user->balance - $request->amount;
-            $affiliate_user->save();
+            if ($affiliate_user->next_withdraw_date != null && strtotime($affiliate_user->next_withdraw_date) > strtotime(Carbon::now())) {
+                flash(translate('Withdraw not available'))->error();
+                return back();
+            }
+            $partial_balance = (($affiliate_user->balance + $affiliate_user->mlm_balance) * .75) - $affiliate_user->withdraw_balance;
+            if ($partial_balance >= $request->amount) {
+                $affiliate_user->total_balance = $affiliate_user->total_balance - $request->amount;
+                $affiliate_user->withdraw_balance = $affiliate_user->withdraw_balance + $request->amount;
+
+                $affiliate_user->next_withdraw_date = Carbon::now()->addDays(15);
+                $affiliate_user->save();
+            } else {
+                flash(translate('Insufficient Balance'))->error();
+                return back();
+            }
+
 
             flash(translate('New withdraw request created successfully'))->success();
             return redirect()->route('affiliate.user.withdraw_request_history');
@@ -604,6 +639,42 @@ class AffiliateController extends Controller
             return back();
         }
     }
+
+    // Affiliate Token Transfer
+    public function token_transfer_store(Request $request)
+    {
+        $affiliate_user = AffiliateUser::where('user_id', Auth::user()->id)->first();
+        if ($affiliate_user->next_withdraw_date_token != null && strtotime($affiliate_user->next_withdraw_date_token) > strtotime(Carbon::now())) {
+            flash(translate('Withdraw not available'))->error();
+            return back();
+        }
+        $partial_balance = (($affiliate_user->balance + $affiliate_user->mlm_balance) * .25) - $affiliate_user->token_withdraw_balance;
+        if ($partial_balance >= $request->amount) {
+            $sellerAccount = User::where('email', $request->transfer_account)->first();
+            $token_transfer = new AffiliateTokenTransfer();
+            $token_transfer->user_id = Auth::user()->id;
+            $token_transfer->amount = $request->amount;
+            $token_transfer->transfer_user_id = $sellerAccount->id;
+            $token_transfer->status = 1;
+            $token_transfer->save();
+
+            $affiliate_user->total_balance = $affiliate_user->total_balance - $request->amount;
+            $affiliate_user->token_withdraw_balance = $affiliate_user->token_withdraw_balance + $request->amount;
+
+            $affiliate_user->next_withdraw_date_token = Carbon::now()->addDays(15);
+            $affiliate_user->save();
+
+            $sellerData = Seller::where('user_id', $sellerAccount->id)->first();
+            $sellerData->token_amount += $request->amount;
+            $sellerData->save();
+        } else {
+            flash(translate('Insufficient Balance'))->error();
+            return back();
+        }
+        flash(translate('New withdraw request created successfully'))->success();
+        return redirect()->route('affiliate.user.token_transfer_history');
+    }
+
 
     public function affiliate_withdraw_requests()
     {
@@ -711,6 +782,7 @@ class AffiliateController extends Controller
             ->where('type', '!=', 1)->paginate(10);
 
         return view('affiliate.frontend.view_product_sales_commission', compact('sales_commission_table', 'report'));
+
     }
 
     public function affiliate_ref_earning()
@@ -723,17 +795,49 @@ class AffiliateController extends Controller
     {
         $users = AffiliateUser::all();
         foreach ($users as $user) {
-            $first_level_sales_volume = AffiliateUser::where('id', $user->first_level_user)->value('total_sale_volume');
-            $first_level_sales_volume *= .04;
+            //For First Level Users
+            $first_level_users = Tree::where('referral_id',$user->user_id)
+                ->where('level_type',1)
+                ->get();
+            $first_level_sales_volume = 0;
+            foreach ($first_level_users as $first_level_user){
+                $temp_first_level_sales_volume = AffiliateUser::where('user_id', $first_level_user->user_id)->value('total_sale_volume');
+                $temp_first_level_sales_volume *= .04;
+                $first_level_sales_volume += $temp_first_level_sales_volume;
+            }
 
-            $second_level_sales_volume = AffiliateUser::where('id', $user->second_level_user)->value('total_sale_volume');
-            $second_level_sales_volume *= .02;
+            //For Second Level Users
+            $second_level_users = Tree::where('referral_id',$user->user_id)
+                ->where('level_type',2)
+                ->get();
+            $second_level_sales_volume = 0;
+            foreach ($second_level_users as $second_level_user){
+                $temp_second_level_sales_volume = AffiliateUser::where('user_id', $second_level_user->user_id)->value('total_sale_volume');
+                $temp_second_level_sales_volume *= .02;
+                $second_level_sales_volume += $temp_second_level_sales_volume;
+            }
 
-            $third_level_sales_volume = AffiliateUser::where('id', $user->third_level_user)->value('total_sale_volume');
-            $third_level_sales_volume *= .01;
+            //For Third Level Users
+            $third_level_users = Tree::where('referral_id',$user->user_id)
+                ->where('level_type',3)
+                ->get();
+            $third_level_sales_volume = 0;
+            foreach ($third_level_users as $third_level_user){
+                $temp_third_level_sales_volume = AffiliateUser::where('user_id', $third_level_user->user_id)->value('total_sale_volume');
+                $temp_third_level_sales_volume *= .01;
+                $third_level_sales_volume += $temp_third_level_sales_volume;
+            }
 
-            $fourth_level_sales_volume = AffiliateUser::where('id', $user->fourth_level_user)->value('total_sale_volume');
-            $fourth_level_sales_volume *= .005;
+            //For Fourth Level Users
+            $fourth_level_users = Tree::where('referral_id',$user->user_id)
+                ->where('level_type',4)
+                ->get();
+            $fourth_level_sales_volume = 0;
+            foreach ($fourth_level_users as $fourth_level_user){
+                $temp_fourth_level_sales_volume = AffiliateUser::where('user_id', $fourth_level_user->user_id)->value('total_sale_volume');
+                $temp_fourth_level_sales_volume *= .01;
+                $fourth_level_sales_volume += $temp_fourth_level_sales_volume;
+            }
 
             $level_sales_volume = $first_level_sales_volume + $second_level_sales_volume + $third_level_sales_volume + $fourth_level_sales_volume;
 
@@ -760,11 +864,23 @@ class AffiliateController extends Controller
             $info->user_id = $user_id;
             $info->status = 1;
             $info->save();
-            flash(translate('Level Commission Generate Successfully'))->success();
-            return back();
 
         }
+        flash(translate('Level Commission Generate Successfully'))->success();
+        return back();
     }
 
+    //Affiliate users tree
+    public function tree($id)
+    {
+        $first_level_users = Tree::where('referral_id', Auth::user()->id)->get();
+        return view('frontend.user_tree.user_tree', compact('first_level_users'));
+    }
 
+    public function view_affiliated_user_info(Request $request)
+    {
+        $affiliate_users = User::where('id', $request->id)->get();
+        return view('frontend.user_tree.view_affiliated_user', compact('affiliate_users'));
+    }
 }
+
